@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "about": "ABOUT",
+    "contact": "CONTATO",
+    "menu": "MENU"
+  },
+  "hero": {
+    "tagline": "let's make projects we believe in",
+    "cta": "talk to me"
+  },
+  "showcase": {
+    "webdesign": "web design",
+    "socialmedia": "social media",
+    "videomaking": "videomaking"
+  },
+  "contact": {
+    "title": "talk to me",
+    "name": "Nome",
+    "phone": "Telefone",
+    "email": "E-mail",
+    "message": "Mensagem curta ou longa, estou aqui para entender o seu projeto.",
+    "send": "enviar",
+    "sending": "enviando...",
+    "success": "Mensagem enviada! Retorno em breve.",
+    "error": "Algo deu errado. Tente novamente."
+  },
+  "about": {
+    "line1": "sancochoz vem do sentimento",
+    "line2": "de fazer e acontecer",
+    "line3": "a ideia sai daí e vem pra cá",
+    "line4": "e o fluxo de trabalho é no seu tempo",
+    "line5": "uma forma de construir marca",
+    "line6": "sem a pressão da performance",
+    "line7": "sabendo que a verdade performa"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "about": "ABOUT",
+    "contact": "CONTACT",
+    "menu": "MENU"
+  },
+  "hero": {
+    "tagline": "let's make projects we believe in",
+    "cta": "talk to me"
+  },
+  "showcase": {
+    "webdesign": "web design",
+    "socialmedia": "social media",
+    "videomaking": "videomaking"
+  },
+  "contact": {
+    "title": "talk to me",
+    "name": "Name",
+    "phone": "Phone",
+    "email": "E-mail",
+    "message": "Short or long message, I'm here to understand your project.",
+    "send": "send",
+    "sending": "sending...",
+    "success": "Message sent! I'll get back to you soon.",
+    "error": "Something went wrong. Please try again."
+  },
+  "about": {
+    "line1": "sancochoz comes from the feeling",
+    "line2": "of making things happen",
+    "line3": "the idea comes from there and lands here",
+    "line4": "and the workflow is at your own pace",
+    "line5": "a way to build a brand",
+    "line6": "without the pressure of performance",
+    "line7": "knowing that truth performs"
+  }
+}
