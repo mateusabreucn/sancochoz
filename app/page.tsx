@@ -5,11 +5,11 @@ import ContactForm from "@/components/ContactForm";
 
 export default function HomePage() {
   return (
-    <>
+    <main>
       <Header />
       <Hero />
       <Showcase />
       <ContactForm />
-    </>
+    </main>
   );
 }

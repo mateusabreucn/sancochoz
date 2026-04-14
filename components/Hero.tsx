@@ -1,11 +1,9 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
 export default function Hero() {
-  const t = useTranslations("hero");
 
   return (
     <section className="px-8 mt-56 mb-32">
@@ -18,7 +16,7 @@ export default function Hero() {
           className="flex justify-center md:justify-end md:pr-8 text-center md:text-right order-2 md:order-1"
         >
           <p className="text-base md:text-xl font-light lowercase text-black/80 whitespace-nowrap">
-            {t("tagline")}
+            let&apos;s make projects we believe in
           </p>
         </motion.div>
 
@@ -97,7 +95,7 @@ export default function Hero() {
               whitespace-nowrap cursor-pointer
             "
           >
-            {t("cta")}
+            talk to me
           </a>
         </motion.div>
       </div>

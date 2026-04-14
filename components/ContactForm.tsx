@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,27 +27,26 @@ function ErrorTooltip({ message }: { message?: string }) {
   );
 }
 
+const contactSchema = z.object({
+  name: z
+    .string()
+    .min(1, "What's your name?")
+    .max(80, "Name is too long"),
+  phone: z.string().optional(),
+  email: z
+    .string()
+    .min(1, "We need your e-mail")
+    .max(120, "E-mail is too long")
+    .email("This doesn't look like a valid e-mail"),
+  message: z.string().min(1, "Tell us about your project").max(2000),
+});
+
+type ContactData = z.infer<typeof contactSchema>;
+
 export default function ContactForm() {
-  const t = useTranslations("contact");
   const [status, setStatus] = useState<
     "idle" | "sending" | "success" | "error"
   >("idle");
-
-  const contactSchema = z.object({
-    name: z
-      .string()
-      .min(1, t("errors.nameRequired"))
-      .max(80, t("errors.nameTooLong")),
-    phone: z.string().optional(),
-    email: z
-      .string()
-      .min(1, t("errors.emailRequired"))
-      .max(120, t("errors.emailTooLong"))
-      .email(t("errors.emailInvalid")),
-    message: z.string().min(1, t("errors.messageRequired")).max(2000),
-  });
-
-  type ContactData = z.infer<typeof contactSchema>;
 
   const {
     register,
@@ -89,7 +87,7 @@ export default function ContactForm() {
   return (
     <section id="contact" className="py-24">
       <h2 className="font-body font-medium text-[clamp(1.5rem,3vw,2rem)] text-center mb-10 text-black">
-        {t("title")}
+        talk to me
       </h2>
 
       <form
@@ -101,7 +99,7 @@ export default function ContactForm() {
         <div className="relative">
           <input
             {...register("name")}
-            placeholder={t("name")}
+            placeholder="Name"
             maxLength={80}
             className={`${inputClasses} ${errors.name ? inputErrorClasses : ""}`}
           />
@@ -121,7 +119,7 @@ export default function ContactForm() {
                 <PhoneField
                   value={field.value || ""}
                   onChange={field.onChange}
-                  placeholder={t("phone")}
+                  placeholder="Phone"
                   focused={phoneFocused}
                   onFocus={() => setPhoneFocused(true)}
                   onBlur={() => setPhoneFocused(false)}
@@ -136,7 +134,7 @@ export default function ContactForm() {
           <input
             {...register("email")}
             type="text"
-            placeholder={t("email")}
+            placeholder="E-mail"
             maxLength={120}
             className={`${inputClasses} ${errors.email ? inputErrorClasses : ""}`}
           />
@@ -160,7 +158,7 @@ export default function ContactForm() {
           />
           {!messageValue && !messageFocused && (
             <span className="absolute inset-0 flex items-center justify-center text-sm text-text-muted pointer-events-none">
-              {t("message")}
+              Short or long message, I&apos;m here to understand your project.
             </span>
           )}
           <ErrorTooltip message={errors.message?.message} />
@@ -171,16 +169,18 @@ export default function ContactForm() {
           disabled={status === "sending"}
           className="self-center mt-4 bg-white text-black font-semibold px-14 py-3 border-2 border-transparent transition-all duration-200 hover:bg-[#FACC15] hover:border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 active:translate-y-0 active:translate-x-0 active:shadow-none disabled:opacity-60"
         >
-          {status === "sending" ? t("sending") : t("send")}
+          {status === "sending" ? "sending..." : "send"}
         </button>
 
         {status === "success" && (
           <p className="text-center text-sm text-green-600 mt-2">
-            {t("success")}
+            Message sent! I&apos;ll get back to you soon.
           </p>
         )}
         {status === "error" && (
-          <p className="text-center text-sm text-red-500 mt-2">{t("error")}</p>
+          <p className="text-center text-sm text-red-500 mt-2">
+            Something went wrong. Please try again.
+          </p>
         )}
       </form>
     </section>

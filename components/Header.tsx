@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 
-export default function Header() {
-  const t = useTranslations("nav");
-  const { locale } = useParams();
+interface HeaderProps {
+  variant?: "default" | "about";
+}
+
+export default function Header({ variant = "default" }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { scrollY } = useScroll();
 
@@ -33,65 +33,94 @@ export default function Header() {
         <div className="h-full flex items-center justify-between mx-12">
           {/* Left: logo bowl + LogoTitle animada (desktop) */}
           <div className="flex items-center gap-4">
-            <Image
-              src="/LogoImage.png"
-              alt="sancochoz"
-              width={64}
-              height={36}
-              priority
-            />
-            {/* Desktop: animada */}
-            <motion.div className="hidden lg:block" style={{ x: titleX }}>
+            <Link href="/">
               <Image
-                src="/LogoTitle.png"
+                src="/LogoImage.png"
                 alt="sancochoz"
-                width={130}
-                height={22}
-                className="w-auto h-6"
+                width={64}
+                height={36}
                 priority
               />
-            </motion.div>
-            {/* Mobile: estática */}
-            <div className="lg:hidden">
-              <Image
-                src="/LogoTitle.png"
-                alt="sancochoz"
-                width={130}
-                height={22}
-                style={{ width: "auto", height: 22 }}
-                priority
-              />
-            </div>
+            </Link>
+            {variant === "about" ? (
+              <Link href="/">
+                <Image
+                  src="/LogoTitle.png"
+                  alt="sancochoz"
+                  width={130}
+                  height={22}
+                  className="w-auto h-6"
+                  priority
+                />
+              </Link>
+            ) : (
+              <>
+                {/* Desktop: animada */}
+                <motion.div className="hidden lg:block" style={{ x: titleX }}>
+                  <Image
+                    src="/LogoTitle.png"
+                    alt="sancochoz"
+                    width={130}
+                    height={22}
+                    className="w-auto h-6"
+                    priority
+                  />
+                </motion.div>
+                {/* Mobile: estática */}
+                <div className="lg:hidden">
+                  <Image
+                    src="/LogoTitle.png"
+                    alt="sancochoz"
+                    width={130}
+                    height={22}
+                    style={{ width: "auto", height: 22 }}
+                    priority
+                  />
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-6">
+          {/* Right side */}
+          {variant === "about" ? (
             <Link
-              href={`/${locale}/about`}
-              className="tracking-[0.08em] uppercase text-black hover:text-accent hover:font-medium transition-colors"
+              href="/"
+              className="tracking-[0.08em] uppercase text-black hover:text-accent hover:font-medium transition-colors text-sm"
             >
-              {t("about")}
+              BACK TO HOME
             </Link>
-            <a
-              href="#contact"
-              className="tracking-[0.08em] uppercase text-black hover:text-accent hover:font-medium transition-colors"
-            >
-              {t("contact")}
-            </a>
-          </nav>
+          ) : (
+            <>
+              {/* Desktop Nav */}
+              <nav className="hidden lg:flex items-center gap-6">
+                <Link
+                  href="/about"
+                  className="tracking-[0.08em] uppercase text-black hover:text-accent hover:font-medium transition-colors text-sm"
+                >
+                  ABOUT
+                </Link>
+                <a
+                  href="#contact"
+                  className="tracking-[0.08em] uppercase text-black hover:text-accent hover:font-medium transition-colors text-sm"
+                >
+                  CONTACT
+                </a>
+              </nav>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="lg:hidden text-[16px] font-medium tracking-[0.08em] uppercase text-black"
-          >
-            {menuOpen ? "CLOSE" : t("menu")}
-          </button>
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="lg:hidden text-[16px] font-medium tracking-[0.08em] uppercase text-black"
+              >
+                {menuOpen ? "CLOSE" : "MENU"}
+              </button>
+            </>
+          )}
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
-      {menuOpen && (
+      {/* Mobile Menu Overlay — only on default variant */}
+      {variant !== "about" && menuOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -100,18 +129,18 @@ export default function Header() {
           style={{ paddingTop: 90 }}
         >
           <Link
-            href={`/${locale}/about`}
+            href="/about"
             onClick={() => setMenuOpen(false)}
             className="text-2xl font-medium tracking-[0.04em] uppercase text-black"
           >
-            {t("about")}
+            ABOUT
           </Link>
           <a
             href="#contact"
             onClick={() => setMenuOpen(false)}
             className="text-2xl font-medium tracking-[0.04em] uppercase text-black"
           >
-            {t("contact")}
+            CONTACT
           </a>
         </motion.div>
       )}

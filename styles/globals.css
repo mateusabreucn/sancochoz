@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: #E8E8E8;
-  --color-bg-alt: #DDDBD6;
-  --color-white: #FFFFFF;
-  --color-black: #0A0A0A;
-  --color-accent: #F5C500;
-  --color-accent-tape: #E8B800;
-  --color-text-muted: #9A9A9A;
-  --color-border: #D0CEC9;
-  --color-header-bg: #FFFFFF;
+  --color-bg: #e8e8e8;
+  --color-bg-alt: #dddbd6;
+  --color-white: #ffffff;
+  --color-black: #0a0a0a;
+  --color-accent: #f5c500;
+  --color-accent-tape: #e8b800;
+  --color-text-muted: #9a9a9a;
+  --color-border: #d0cec9;
+  --color-header-bg: #ffffff;
 
   --spacing-page-x: clamp(1.5rem, 5vw, 5rem);
   --header-height: 64px;
