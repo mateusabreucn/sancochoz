@@ -1,0 +1,106 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import Image from "next/image";
+
+export default function Hero() {
+  const t = useTranslations("hero");
+
+  return (
+    <section className="px-8 mt-56 mb-32">
+      <div className="grid grid-cols-1 md:grid-cols-3 items-center justify-center gap-12 md:gap-8 max-w-[1400px] mx-auto">
+        {/* Coluna 1 — Tagline */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="flex justify-center md:justify-end md:pr-8 text-center md:text-right order-2 md:order-1"
+        >
+          <p className="text-base md:text-xl font-light lowercase text-black/80 whitespace-nowrap">
+            {t("tagline")}
+          </p>
+        </motion.div>
+
+        {/* Coluna 2 — Polaroid */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, ease: "easeOut" }}
+          className="flex justify-center items-center relative w-full h-full order-1 md:order-2 py-12 md:py-0"
+        >
+          <div className="relative group transition-transform duration-300 hover:-rotate-3">
+            {/* Sombra atrás do polaroid */}
+            <div className="absolute bottom-[-2px] right-[-2px] w-[90%] h-[90%] bg-black/80 blur-[6px] z-0" />
+
+            {/* Frame do polaroid */}
+            <div className="relative bg-[#EFE9D9] p-4 border border-black/5 z-10">
+              <div className="relative w-[270px] h-[270px] md:w-[320px] md:h-[320px] overflow-hidden border border-black/5">
+                <Image
+                  src="/HeroImage.png"
+                  alt="Foto Gustavo"
+                  fill
+                  priority
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="mt-4 flex justify-center">
+                <Image
+                  src="/NomePolaroid.png"
+                  alt="Gustavo"
+                  width={260}
+                  height={60}
+                  className="object-contain mx-auto block brightness-90"
+                />
+              </div>
+            </div>
+
+            {/* Fita preta — canto superior esquerdo */}
+            <div className="absolute top-[-10px] left-[-60px] w-40 h-12 -rotate-[12deg] z-20 pointer-events-none">
+              <Image
+                src="/FitaPreta.png"
+                alt=""
+                fill
+                className="object-contain"
+              />
+            </div>
+
+            {/* Fita amarela — canto inferior direito */}
+            <div className="absolute bottom-[-5px] right-[-60px] w-40 h-12 -rotate-[25deg] z-20 pointer-events-none">
+              <Image
+                src="/FitaAmarela.png"
+                alt=""
+                fill
+                className="object-contain scale-x-[-1]"
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Coluna 3 — Botão CTA */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="flex justify-center md:justify-start md:pl-8 order-3"
+        >
+          <a
+            href="#contact"
+            className="
+              bg-white text-black text-base font-semibold px-24 py-3
+              border-2 border-transparent
+              transition-all duration-200
+              hover:bg-[#FACC15] hover:border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+              hover:-translate-y-1 hover:-translate-x-1
+              active:translate-y-0 active:translate-x-0 active:shadow-none
+              whitespace-nowrap cursor-pointer
+            "
+          >
+            {t("cta")}
+          </a>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
