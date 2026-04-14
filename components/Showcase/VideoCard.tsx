@@ -19,6 +19,7 @@ export default function VideoCard({
 }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const userMuted = useRef(false);
   const [isMuted, setIsMuted] = useState(true);
   const dimmed = isAnyHovered && !isHovered;
 
@@ -26,10 +27,13 @@ export default function VideoCard({
     const video = videoRef.current;
     if (!video) return;
 
-    const handleReady = () => video.play().catch(() => {});
+    const handleReady = () => {
+      video.muted = true;
+      video.play().catch(() => {});
+    };
 
     if (video.readyState >= 3) {
-      video.play().catch(() => {});
+      handleReady();
     } else {
       video.addEventListener("canplay", handleReady);
     }
@@ -38,31 +42,42 @@ export default function VideoCard({
   }, [src]);
 
   useEffect(() => {
-    if (!videoRef.current) return;
+    const video = videoRef.current;
+    if (!video) return;
     if (dimmed) {
-      videoRef.current.pause();
-    } else {
-      videoRef.current.play().catch(() => {});
+      video.pause();
+    } else if (!isHovered) {
+      video.muted = true;
+      video.play().catch(() => {});
     }
-  }, [dimmed]);
+  }, [dimmed, isHovered]);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
     onHoverStart();
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = userMuted.current;
+    setIsMuted(userMuted.current);
+    video.play().catch(() => {});
   };
 
   const handleMouseLeave = (e: React.MouseEvent) => {
     if (e.currentTarget.contains(e.relatedTarget as Node)) return;
     setIsHovered(false);
     onHoverEnd();
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = true;
+    setIsMuted(true);
   };
 
   const toggleMute = () => {
-    const newMuted = !isMuted;
-    setIsMuted(newMuted);
-    if (videoRef.current) {
-      videoRef.current.muted = newMuted;
-    }
+    const video = videoRef.current;
+    if (!video) return;
+    userMuted.current = !userMuted.current;
+    video.muted = userMuted.current;
+    setIsMuted(userMuted.current);
   };
 
   return (
