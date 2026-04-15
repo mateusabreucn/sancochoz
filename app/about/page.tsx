@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Footer from "@/components/Footer";
 
 const aboutText = {
   en: {
@@ -13,7 +14,6 @@ const aboutText = {
     line5: "a way to build a brand",
     line6: "without the pressure of performance",
     line7: "knowing that truth performs",
-    cta: "talk to me",
   },
   pt: {
     line1: "sancochoz vem do sentimento",
@@ -23,7 +23,6 @@ const aboutText = {
     line5: "uma forma de construir marca",
     line6: "sem a pressão da performance",
     line7: "sabendo que a verdade performa",
-    cta: "talk to me",
   },
 } as const;
 
@@ -33,78 +32,80 @@ export default function AboutPage() {
   const [lang, setLang] = useState<Lang>("en");
   const t = aboutText[lang];
 
-  const lines = [t.line1, t.line2, "", t.line3, t.line4, "", t.line5, t.line6, t.line7];
+  const lines = [
+    t.line1,
+    t.line2,
+    "",
+    t.line3,
+    t.line4,
+    "",
+    t.line5,
+    t.line6,
+    t.line7,
+  ];
+  const langIndex = lang === "en" ? 0 : 1;
 
   return (
-    <main className="pt-[calc(90px+3rem)] pb-24 px-[var(--spacing-page-x)]">
-      <div className="max-w-page mx-auto">
-        {/* Language Toggle */}
-        <div className="flex gap-2 mb-12">
-          {(["en", "pt"] as Lang[]).map((l) => (
-            <button
-              key={l}
-              onClick={() => setLang(l)}
-              className={`font-body text-sm tracking-[0.05em] px-3 py-1 transition-colors ${
-                lang === l
-                  ? "bg-bg-alt text-black border border-border"
-                  : "text-text-muted bg-transparent border border-transparent"
-              }`}
-            >
-              {l.toUpperCase()}
-            </button>
-          ))}
-        </div>
-
-        {/* Two columns: text + logo */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-12 lg:gap-24">
-          {/* Text */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-[480px]"
+    <div className="w-fit md:w-2/3 flex flex-col mx-auto mt-20 gap-8 lg:gap-0">
+      {/* Language Toggle */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        className="relative grid grid-cols-2 w-24 md:w-32 xs:-ml-8"
+      >
+        <motion.div
+          className="absolute top-0 left-0 h-full w-1/2 bg-[#d4d4d4] rounded-sm"
+          animate={{ x: `${langIndex * 100}%` }}
+          transition={{ type: "spring", stiffness: 500, damping: 35 }}
+        />
+        {(["en", "pt"] as Lang[]).map((l) => (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            className="relative z-10 font-body font-extralight text-sm md:text-lg text-black px-4 py-2 text-center"
           >
-            {lines.map((line, i) =>
-              line === "" ? (
-                <div key={i} className="h-6" />
-              ) : (
-                <p
-                  key={i}
-                  className="font-body text-[clamp(0.9rem,1.5vw,1.1rem)] text-text-muted leading-[1.8]"
-                >
-                  {line}
-                </p>
-              )
-            )}
+            {l.toUpperCase()}
+          </button>
+        ))}
+      </motion.div>
 
-            {/* CTA */}
-            <div className="mt-10">
-              <a
-                href="/#contact"
-                className="inline-block border-[1.5px] border-black text-black font-body font-medium text-[0.95rem] tracking-[0.02em] px-8 py-3.5 hover:bg-black hover:text-white transition-all duration-200"
+      {/* Grid: text + logo */}
+      <div className="w-fit md:w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="max-w-[480px] text-left w-full md:justify-self-end"
+        >
+          {lines.map((line, i) =>
+            line === "" ? (
+              <div key={i} className="h-6" />
+            ) : (
+              <p
+                key={i}
+                className="font-body text-[clamp(0.85rem,1.5vw,1.2rem)] text-text-muted leading-[1.8] whitespace-nowrap"
               >
-                {t.cta}
-              </a>
-            </div>
-          </motion.div>
+                {line}
+              </p>
+            ),
+          )}
+        </motion.div>
 
-          {/* Large Bowl Logo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex-shrink-0"
-          >
-            <Image
-              src="/LogoImage.png"
-              alt="sancochoz"
-              width={350}
-              height={350}
-              className="w-[clamp(200px,25vw,350px)] h-auto"
-            />
-          </motion.div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <Image
+            src="/LogoImage.svg"
+            alt="sancochoz"
+            width={500}
+            height={500}
+            className="w-auto h-auto"
+          />
+        </motion.div>
       </div>
-    </main>
+    </div>
   );
 }
