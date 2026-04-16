@@ -7,7 +7,13 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PhoneField from "./PhoneField";
 
-function ErrorTooltip({ message }: { message?: string }) {
+function ErrorTooltip({
+  message,
+  className,
+}: {
+  message?: string;
+  className?: string;
+}) {
   return (
     <AnimatePresence>
       {message && (
@@ -16,7 +22,7 @@ function ErrorTooltip({ message }: { message?: string }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
           transition={{ duration: 0.2 }}
-          className="absolute left-1/2 -translate-x-1/2 -bottom-7 z-20"
+          className={`absolute left-1/2 -translate-x-1/2 -bottom-7 z-20 ${className ?? ""}`}
         >
           <div className="bg-[#0A0A0A] text-white text-xs font-body px-4 py-1.5 whitespace-nowrap">
             {message}
@@ -28,17 +34,14 @@ function ErrorTooltip({ message }: { message?: string }) {
 }
 
 const contactSchema = z.object({
-  name: z
-    .string()
-    .min(1, "What's your name?")
-    .max(80, "Name is too long"),
-  phone: z.string().optional(),
+  name: z.string().min(1, "what's your name?").max(80, "name is too long"),
+  phone: z.string().min(1, "what's your phone?").max(30, "phone is too long"),
   email: z
     .string()
-    .min(1, "We need your e-mail")
-    .max(120, "E-mail is too long")
-    .email("This doesn't look like a valid e-mail"),
-  message: z.string().min(1, "Tell us about your project").max(2000),
+    .min(1, "your e-mail plz")
+    .max(120, "e-mail is too long")
+    .email("this doesn't look like a valid e-mail"),
+  message: z.string().min(1, "tell us about your project").max(2000),
 });
 
 type ContactData = z.infer<typeof contactSchema>;
@@ -85,7 +88,7 @@ export default function ContactForm() {
   const inputErrorClasses = "ring-1 ring-red-400/60";
 
   return (
-    <section id="contact" className="py-24">
+    <section id="contact" className="py-24 mx-12">
       <h2 className="font-body font-medium text-[clamp(1.5rem,3vw,2rem)] text-center mb-10 text-black">
         talk to me
       </h2>
@@ -114,7 +117,7 @@ export default function ContactForm() {
             defaultValue=""
             render={({ field }) => (
               <div
-                className={`h-24 bg-[#FCFCFC] border-2 transition-all ${phoneFocused ? "border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" : "border-transparent"}`}
+                className={`h-24 bg-[#FCFCFC] border-2 transition-all ${phoneFocused ? "border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" : "border-transparent"} ${errors.phone ? inputErrorClasses : ""}`}
               >
                 <PhoneField
                   value={field.value || ""}
@@ -127,6 +130,7 @@ export default function ContactForm() {
               </div>
             )}
           />
+          <ErrorTooltip message={errors.phone?.message} />
         </div>
 
         {/* Email */}
@@ -142,26 +146,31 @@ export default function ContactForm() {
         </div>
 
         {/* Message */}
-        <div className="relative min-h-[256px]">
-          <textarea
-            {...register("message", {
-              onChange: (e) => {
-                const el = e.target;
-                el.style.height = "auto";
-                el.style.height = Math.max(256, el.scrollHeight) + "px";
-              },
-            })}
-            onFocus={() => setMessageFocused(true)}
-            onBlur={() => setMessageFocused(false)}
-            maxLength={2000}
-            className={`${inputClasses} min-h-[256px] resize-none py-4 overflow-hidden placeholder:text-transparent ${errors.message ? inputErrorClasses : ""}`}
-          />
-          {!messageValue && !messageFocused && (
-            <span className="absolute inset-0 flex items-center justify-center text-sm text-text-muted pointer-events-none">
-              Short or long message, I&apos;m here to understand your project.
-            </span>
-          )}
-          <ErrorTooltip message={errors.message?.message} />
+        <div className="relative">
+          <div className="relative min-h-[256px]">
+            <textarea
+              {...register("message", {
+                onChange: (e) => {
+                  const el = e.target;
+                  el.style.height = "auto";
+                  el.style.height = Math.max(220, el.scrollHeight) + "px";
+                },
+              })}
+              onFocus={() => setMessageFocused(true)}
+              onBlur={() => setMessageFocused(false)}
+              maxLength={2000}
+              className={`${inputClasses} min-h-[256px] resize-none py-4 overflow-hidden placeholder:text-transparent ${errors.message ? inputErrorClasses : ""}`}
+            />
+            {!messageValue && !messageFocused && (
+              <span className="absolute inset-0 flex items-center justify-center text-sm text-text-muted pointer-events-none">
+                Short or long message, I&apos;m here to understand your project.
+              </span>
+            )}
+            <ErrorTooltip
+              message={errors.message?.message}
+              className="!-bottom-[22px]"
+            />
+          </div>
         </div>
 
         <button
@@ -172,15 +181,19 @@ export default function ContactForm() {
           {status === "sending" ? "sending..." : "send"}
         </button>
 
+        <p className="text-center text-xs font-body text-black/40 -mt-4">
+          by sending, you authorize the use of your contact data
+        </p>
+
         {status === "success" && (
-          <p className="text-center text-sm text-green-600 mt-2">
-            Message sent! I&apos;ll get back to you soon.
-          </p>
+          <div className="self-center bg-[#0A0A0A] text-white text-xs font-body px-6 py-2">
+            thanks — i&apos;ll be in touch ASAP
+          </div>
         )}
         {status === "error" && (
-          <p className="text-center text-sm text-red-500 mt-2">
-            Something went wrong. Please try again.
-          </p>
+          <div className="self-center bg-[#0A0A0A] text-white text-xs font-body px-6 py-2">
+            something went wrong — please try again
+          </div>
         )}
       </form>
     </section>

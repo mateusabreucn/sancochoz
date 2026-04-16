@@ -5,8 +5,8 @@ import { useState, useRef, useEffect } from "react";
 type Option = { code: string; flag: string; name: string };
 
 const options: Option[] = [
-  { code: "+55", flag: "🇧🇷", name: "Brasil" },
   { code: "+351", flag: "🇵🇹", name: "Portugal" },
+  { code: "+55", flag: "🇧🇷", name: "Brasil" },
   { code: "", flag: "🌐", name: "Outro" },
 ];
 
