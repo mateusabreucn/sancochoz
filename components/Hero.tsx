@@ -1,11 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
+import PolaroidDeck from "./PolaroidDeck";
 
 export default function Hero() {
   return (
-    <section className="mt-48 mb-40">
+    <section className="my-48">
       <div className="grid grid-cols-1 md:grid-cols-3 items-center justify-center gap-12 md:gap-8 max-w-[1400px] mx-auto">
         {/* Coluna 1 — Tagline */}
         <motion.div
@@ -19,60 +19,14 @@ export default function Hero() {
           </p>
         </motion.div>
 
-        {/* Coluna 2 — Polaroid */}
+        {/* Coluna 2 — Polaroid Deck */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65, ease: "easeOut" }}
-          className="flex justify-center items-center relative w-full h-full order-1 md:order-2 py-12 md:py-0"
+          className="flex justify-center items-center w-full order-1 md:order-2 py-12 md:py-0"
         >
-          <div className="relative group transition-transform duration-300 hover:-rotate-3">
-            {/* Sombra atrás do polaroid */}
-            <div className="absolute bottom-[-2px] right-[-2px] w-[90%] h-[90%] bg-black/80 blur-[6px] z-0" />
-
-            {/* Frame do polaroid */}
-            <div className="relative bg-[#FCFCFC] p-3 border border-black/5 z-10">
-              <div className="relative w-[250px] h-[250px] md:w-[295px] md:h-[295px] overflow-hidden border border-black/5">
-                <Image
-                  src="/HeroImage.png"
-                  alt="Foto Gustavo"
-                  fill
-                  priority
-                  className="object-cover"
-                />
-              </div>
-
-              <div className="mt-3 flex justify-center">
-                <Image
-                  src="/NomePolaroid.png"
-                  alt="Gustavo"
-                  width={240}
-                  height={56}
-                  className="object-contain mx-auto block brightness-90"
-                />
-              </div>
-            </div>
-
-            {/* Fita preta — canto superior esquerdo */}
-            <div className="absolute top-[-10px] left-[-60px] w-40 h-12 -rotate-[12deg] z-20 pointer-events-none">
-              <Image
-                src="/FitaPreta.png"
-                alt=""
-                fill
-                className="object-contain"
-              />
-            </div>
-
-            {/* Fita amarela — canto inferior direito */}
-            <div className="absolute bottom-[-5px] right-[-60px] w-40 h-12 -rotate-[25deg] z-20 pointer-events-none">
-              <Image
-                src="/FitaAmarela.png"
-                alt=""
-                fill
-                className="object-contain scale-x-[-1]"
-              />
-            </div>
-          </div>
+          <PolaroidDeck />
         </motion.div>
 
         {/* Coluna 3 — Botão CTA */}
