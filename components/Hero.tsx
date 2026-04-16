@@ -4,9 +4,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 
 export default function Hero() {
-
   return (
-    <section className="px-8 mt-56 mb-32">
+    <section className="mt-48 mb-40">
       <div className="grid grid-cols-1 md:grid-cols-3 items-center justify-center gap-12 md:gap-8 max-w-[1400px] mx-auto">
         {/* Coluna 1 — Tagline */}
         <motion.div
@@ -15,7 +14,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.15 }}
           className="flex justify-center md:justify-end md:pr-8 text-center md:text-right order-2 md:order-1"
         >
-          <p className="text-base md:text-xl font-light lowercase text-black/80 whitespace-nowrap">
+          <p className="text-sm md:text-lg font-light lowercase text-black/80 whitespace-nowrap">
             let&apos;s make projects we believe in
           </p>
         </motion.div>
@@ -32,8 +31,8 @@ export default function Hero() {
             <div className="absolute bottom-[-2px] right-[-2px] w-[90%] h-[90%] bg-black/80 blur-[6px] z-0" />
 
             {/* Frame do polaroid */}
-            <div className="relative bg-[#EFE9D9] p-4 border border-black/5 z-10">
-              <div className="relative w-[270px] h-[270px] md:w-[320px] md:h-[320px] overflow-hidden border border-black/5">
+            <div className="relative bg-[#FCFCFC] p-3 border border-black/5 z-10">
+              <div className="relative w-[250px] h-[250px] md:w-[295px] md:h-[295px] overflow-hidden border border-black/5">
                 <Image
                   src="/HeroImage.png"
                   alt="Foto Gustavo"
@@ -43,12 +42,12 @@ export default function Hero() {
                 />
               </div>
 
-              <div className="mt-4 flex justify-center">
+              <div className="mt-3 flex justify-center">
                 <Image
                   src="/NomePolaroid.png"
                   alt="Gustavo"
-                  width={260}
-                  height={60}
+                  width={240}
+                  height={56}
                   className="object-contain mx-auto block brightness-90"
                 />
               </div>
@@ -86,7 +85,7 @@ export default function Hero() {
           <a
             href="#contact"
             className="
-              bg-white text-black text-base font-semibold px-24 py-3
+              bg-white text-black text-base font-semibold px-20 py-3
               border-2 border-transparent
               transition-all duration-200
               hover:bg-[#FACC15] hover:border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]

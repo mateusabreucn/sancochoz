@@ -1,16 +1,9 @@
-import { Inter, Anton, Permanent_Marker } from "next/font/google";
+import { Inter, Permanent_Marker } from "next/font/google";
 import "@/styles/globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-  display: "swap",
-});
-
-const anton = Anton({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-anton",
   display: "swap",
 });
 
@@ -22,7 +15,7 @@ const permanentMarker = Permanent_Marker({
 });
 
 export const metadata = {
-  title: "sancochoz — web design, social media, videomaking",
+  title: "sancochoz",
   description: "let's make projects we believe in",
   openGraph: {
     title: "sancochoz",
@@ -38,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${anton.variable} ${permanentMarker.variable} font-body bg-bg`}
+        className={`${inter.variable} ${permanentMarker.variable} font-body bg-bg`}
       >
         {children}
       </body>
