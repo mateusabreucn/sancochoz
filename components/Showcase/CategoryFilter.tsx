@@ -17,7 +17,11 @@ const categories: { key: Category; label: string }[] = [
 
 export default function CategoryFilter({ active, onChange }: CategoryFilterProps) {
   return (
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none flex flex-col items-center gap-5">
+    <div className="
+      absolute z-10 pointer-events-none flex flex-col gap-5
+      bottom-6 left-4 items-start
+      lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center lg:bottom-auto
+    ">
       {categories.map(({ key, label }) => {
         const isActive = active === key;
         return (
@@ -26,8 +30,9 @@ export default function CategoryFilter({ active, onChange }: CategoryFilterProps
             onClick={() => onChange(key)}
             className={`
               relative overflow-hidden group pointer-events-auto font-body
-              text-[clamp(1.2rem,2.5vw,2rem)] font-black tracking-[0.08em] lowercase
-              px-8 py-2 leading-tight text-center w-[320px]
+              text-[clamp(1rem,2.5vw,2rem)] font-black tracking-[0.08em] lowercase
+              px-4 py-1.5 lg:px-8 lg:py-2 leading-tight text-center
+              w-[160px] lg:w-[320px]
               border-2 transition-all duration-200
               ${
                 isActive

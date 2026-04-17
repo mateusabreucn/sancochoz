@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,7 +11,7 @@ const LogoBg = () => (
   </div>
 );
 
-const LogoBgMotion = ({ opacity }: { opacity: ReturnType<typeof useTransform> }) => (
+const LogoBgMotion = ({ opacity }: { opacity: MotionValue<number> }) => (
   <motion.div className="absolute inset-0 -z-10 overflow-hidden" style={{ opacity }}>
     <Image src="/FundoAmarelo.png" alt="" fill className="object-cover" />
   </motion.div>

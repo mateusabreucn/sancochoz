@@ -155,7 +155,7 @@ export default function Showcase() {
     <section className="relative w-full overflow-x-clip">
       <div
         ref={containerRef}
-        className="relative h-[500px] md:h-[600px] cursor-grab active:cursor-grabbing select-none"
+        className="relative h-screen lg:h-[600px] cursor-grab active:cursor-grabbing select-none"
         onPointerDown={onPointerDown}
       >
         <div
