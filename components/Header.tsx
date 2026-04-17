@@ -5,6 +5,18 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
+const LogoBg = () => (
+  <div className="absolute inset-0 -z-10 overflow-hidden">
+    <Image src="/FundoAmarelo.png" alt="" fill className="object-cover" />
+  </div>
+);
+
+const LogoBgMotion = ({ opacity }: { opacity: ReturnType<typeof useTransform> }) => (
+  <motion.div className="absolute inset-0 -z-10 overflow-hidden" style={{ opacity }}>
+    <Image src="/FundoAmarelo.png" alt="" fill className="object-cover" />
+  </motion.div>
+);
+
 interface HeaderProps {
   variant?: "default" | "about";
 }
@@ -55,9 +67,9 @@ export default function Header({ variant = "default" }: HeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-[200] h-14 lg:h-16 bg-white shadow-lg">
+      <header className="sticky top-0 z-[200] h-14 lg:h-20 bg-white shadow-lg">
         {/* ── Mobile layout ── */}
-        <div className="md:hidden h-full flex items-center px-4 relative">
+        <div className="lg:hidden h-full flex items-center px-4 relative">
           <motion.div {...fade(0)}>
             <Link href="/">
               <Image
@@ -76,7 +88,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
             className="absolute left-1/2 -translate-x-1/2"
           >
             <div className="relative px-3 py-1.5">
-              <span className="absolute inset-0 -z-10 bg-accent" />
+              <LogoBg />
               {variant === "about" ? (
                 <Link href="/">
                   <LogoTitle size="mobile" />
@@ -104,7 +116,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
         </div>
 
         {/* ── Desktop layout ── */}
-        <div className="hidden md:flex h-full items-center px-12 relative">
+        <div className="hidden lg:flex h-full items-center px-12 relative">
           {/* Logo icon — always left */}
           <motion.div {...fade(0)}>
             <Link href="/">
@@ -128,10 +140,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
               {...fade(0.1)}
             >
               <div className="relative px-3 py-2 mb-1.5">
-                <motion.span
-                  className="absolute inset-0 -z-10 bg-accent"
-                  style={{ opacity: highlightOpacity }}
-                />
+                <LogoBgMotion opacity={highlightOpacity} />
                 <LogoTitle size="desktop" />
               </div>
             </motion.div>
@@ -145,7 +154,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
             >
               <Link href="/">
                 <div className="relative px-3 py-2">
-                  <span className="absolute inset-0 -z-10 bg-accent" />
+                  <LogoBg />
                   <LogoTitle size="desktop" />
                 </div>
               </Link>

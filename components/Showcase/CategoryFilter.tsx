@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 type Category = "webdesign" | "socialmedia" | "videomaking";
 
 interface CategoryFilterProps {
@@ -23,19 +25,26 @@ export default function CategoryFilter({ active, onChange }: CategoryFilterProps
             key={key}
             onClick={() => onChange(key)}
             className={`
-              pointer-events-auto font-body
+              relative overflow-hidden group pointer-events-auto font-body
               text-[clamp(1.2rem,2.5vw,2rem)] font-black tracking-[0.08em] lowercase
               px-8 py-2 leading-tight text-center w-[320px]
-              border-2 border-transparent
-              transition-all duration-200
+              border-2 transition-all duration-200
               ${
                 isActive
-                  ? "bg-accent text-black border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                  : "bg-white text-black border-transparent shadow-none hover:bg-accent hover:border-transparent hover:shadow-none hover:-translate-y-1 hover:-translate-x-1"
+                  ? "bg-transparent border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                  : "bg-white border-transparent shadow-none hover:border-transparent hover:shadow-none hover:-translate-y-1 hover:-translate-x-1"
               }
             `}
           >
-            {label}
+            {/* FundoAmarelo — sempre visível no ativo, aparece no hover nos inativos */}
+            <span
+              className={`absolute inset-0 transition-opacity duration-200 pointer-events-none ${
+                isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+              }`}
+            >
+              <Image src="/FundoAmarelo.png" alt="" fill className="object-cover" />
+            </span>
+            <span className="relative z-10 text-black">{label}</span>
           </button>
         );
       })}
