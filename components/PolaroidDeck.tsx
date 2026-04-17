@@ -4,18 +4,18 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import gsap from "gsap";
 import Image from "next/image";
 
-const PHOTOS = [
-  "/HeroImage.png",
-  "https://picsum.photos/seed/sancochoz1/600/600",
-  "https://picsum.photos/seed/sancochoz2/600/600",
-  "https://picsum.photos/seed/sancochoz3/600/600",
+const POLAROIDS = [
+  { photo: "/Polaroid/1/Polaroid1.png", detail: "/Polaroid/1/Detalhe1.png" },
+  { photo: "/Polaroid/2/Polaroid2.png", detail: "/Polaroid/2/Detalhe2.png" },
+  { photo: "/Polaroid/3/Polaroid3.png", detail: "/Polaroid/3/Detalhe3.png" },
+  { photo: "/Polaroid/4/Polaroid4.png", detail: "/Polaroid/4/Detalhe4.png" },
 ];
 
 // Deck opens to the right — back cards peek from the right
 const STACK = [
-  { x: 0,  y: 0,  rotate: 1,  scale: 1,    zIndex: 40 },
-  { x: 16, y: 5,  rotate: 5,  scale: 0.97, zIndex: 30 },
-  { x: 28, y: 9,  rotate: 9,  scale: 0.94, zIndex: 20 },
+  { x: 0, y: 0, rotate: 1, scale: 1, zIndex: 40 },
+  { x: 16, y: 5, rotate: 5, scale: 0.97, zIndex: 30 },
+  { x: 28, y: 9, rotate: 9, scale: 0.94, zIndex: 20 },
   { x: 38, y: 13, rotate: 13, scale: 0.91, zIndex: 10 },
 ];
 
@@ -44,7 +44,10 @@ export default function PolaroidDeck() {
     const frontEl = cardRefs.current[currentFront];
     const backPos = STACK[3];
 
-    if (!frontEl) { isAnimating.current = false; return; }
+    if (!frontEl) {
+      isAnimating.current = false;
+      return;
+    }
 
     // Back cards ease forward with slight stagger
     deckOrder.current.slice(1).forEach((photoIdx, i) => {
@@ -64,13 +67,17 @@ export default function PolaroidDeck() {
     });
 
     // Front card: arc exit right → snap behind (off-screen) → slide + fade in
-    gsap.timeline({
-      onComplete: () => {
-        deckOrder.current = [...deckOrder.current.slice(1), deckOrder.current[0]];
-        setFrontPhotoIdx(deckOrder.current[0]);
-        isAnimating.current = false;
-      },
-    })
+    gsap
+      .timeline({
+        onComplete: () => {
+          deckOrder.current = [
+            ...deckOrder.current.slice(1),
+            deckOrder.current[0],
+          ];
+          setFrontPhotoIdx(deckOrder.current[0]);
+          isAnimating.current = false;
+        },
+      })
       .to(frontEl, {
         x: 460,
         y: -15,
@@ -101,7 +108,9 @@ export default function PolaroidDeck() {
 
   useEffect(() => {
     timerRef.current = setInterval(advance, AUTO_INTERVAL);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, [advance]);
 
   return (
@@ -110,10 +119,12 @@ export default function PolaroidDeck() {
       style={{ width: 330, height: 380 }}
       onClick={advance}
     >
-      {PHOTOS.map((photo, photoIdx) => (
+      {POLAROIDS.map(({ photo, detail }, photoIdx) => (
         <div
           key={photoIdx}
-          ref={(el) => { cardRefs.current[photoIdx] = el; }}
+          ref={(el) => {
+            cardRefs.current[photoIdx] = el;
+          }}
           style={{ position: "absolute", top: 0, left: 0 }}
         >
           {/* Shadow */}
@@ -132,24 +143,33 @@ export default function PolaroidDeck() {
             </div>
             <div className="mt-3 flex justify-center">
               <Image
-                src="/NomePolaroid.png"
-                alt="Gustavo"
+                src={detail}
+                alt=""
                 width={240}
                 height={56}
                 className="object-contain mx-auto block brightness-90"
               />
             </div>
           </div>
-
         </div>
       ))}
 
       {/* Tapes — fixed in container, always on top, never animate with cards */}
       <div className="absolute top-[-10px] left-[-60px] w-40 h-12 -rotate-[12deg] z-50 pointer-events-none">
-        <Image src="/FitaPreta.png" alt="" fill className="object-contain" />
+        <Image
+          src="/Polaroid/FitaPreta.png"
+          alt=""
+          fill
+          className="object-contain"
+        />
       </div>
       <div className="absolute bottom-[33px] md:bottom-[13px] right-[-6px] md:right-[-26px] w-40 h-12 -rotate-[25deg] z-50 pointer-events-none">
-        <Image src="/FitaAmarela.png" alt="" fill className="object-contain scale-x-[-1]" />
+        <Image
+          src="/Polaroid/FitaAmarela.png"
+          alt=""
+          fill
+          className="object-contain scale-x-[-1]"
+        />
       </div>
     </div>
   );
