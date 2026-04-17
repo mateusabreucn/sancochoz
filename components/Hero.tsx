@@ -42,7 +42,7 @@ export default function Hero() {
               bg-white text-black text-base font-semibold px-20 py-3
               border-2 border-transparent
               transition-all duration-200
-              hover:bg-[#FACC15] hover:border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+              hover:bg-accent hover:border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
               hover:-translate-y-1 hover:-translate-x-1
               active:translate-y-0 active:translate-x-0 active:shadow-none
               whitespace-nowrap cursor-pointer

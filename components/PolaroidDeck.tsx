@@ -120,7 +120,7 @@ export default function PolaroidDeck() {
           <div className="absolute bottom-[-2px] right-[-2px] w-[90%] h-[90%] bg-black/40 blur-[4px] z-0" />
 
           {/* Frame */}
-          <div className="relative bg-[#FCFCFC] p-3 border border-black/5 shadow-md z-10">
+          <div className="relative bg-white-soft p-3 border border-black/5 shadow-md z-10">
             <div className="relative w-[250px] h-[250px] md:w-[270px] md:h-[270px] overflow-hidden border border-black/5">
               <Image
                 src={photo}

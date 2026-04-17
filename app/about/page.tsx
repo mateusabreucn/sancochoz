@@ -55,7 +55,7 @@ export default function AboutPage() {
           className="relative grid grid-cols-2 w-24 md:w-32 md:-ml-8"
         >
           <motion.div
-            className="absolute top-0 left-0 h-full w-1/2 bg-[#d4d4d4]"
+            className="absolute top-0 left-0 h-full w-1/2 bg-gray-soft"
             animate={{ x: `${langIndex * 100}%` }}
             transition={{ type: "spring", stiffness: 500, damping: 35 }}
           />

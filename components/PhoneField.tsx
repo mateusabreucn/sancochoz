@@ -135,8 +135,8 @@ export default function PhoneField({
             {!isOther && (
               <span className="text-xs text-text-muted">{selected.code}</span>
             )}
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className="ml-0.5">
-              <path d="M1 1L5 5L9 1" stroke="#9A9A9A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className="ml-0.5 text-text-muted">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
 
@@ -151,8 +151,8 @@ export default function PhoneField({
                     e.preventDefault();
                     handleSelect(opt);
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-[#FACC15] transition-colors text-left ${
-                    selected.name === opt.name ? "bg-[#FACC15]/30" : ""
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-accent transition-colors text-left ${
+                    selected.name === opt.name ? "bg-accent/30" : ""
                   }`}
                 >
                   <span className="text-base leading-none">{opt.flag}</span>

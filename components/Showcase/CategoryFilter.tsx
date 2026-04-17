@@ -30,8 +30,8 @@ export default function CategoryFilter({ active, onChange }: CategoryFilterProps
               transition-all duration-200
               ${
                 isActive
-                  ? "bg-[#FACC15] text-black border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                  : "bg-white text-black border-transparent shadow-none hover:bg-[#FACC15] hover:border-transparent hover:shadow-none hover:-translate-y-1 hover:-translate-x-1"
+                  ? "bg-accent text-black border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                  : "bg-white text-black border-transparent shadow-none hover:bg-accent hover:border-transparent hover:shadow-none hover:-translate-y-1 hover:-translate-x-1"
               }
             `}
           >
