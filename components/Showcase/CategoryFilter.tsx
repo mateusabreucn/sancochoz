@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 type Category = "webdesign" | "socialmedia" | "videomaking";
 
 interface CategoryFilterProps {
@@ -41,14 +39,11 @@ export default function CategoryFilter({ active, onChange }: CategoryFilterProps
               }
             `}
           >
-            {/* FundoAmarelo — sempre visível no ativo, aparece no hover nos inativos */}
             <span
-              className={`absolute inset-0 transition-opacity duration-200 pointer-events-none ${
+              className={`absolute inset-0 bg-accent transition-opacity duration-200 pointer-events-none ${
                 isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
               }`}
-            >
-              <Image src="/FundoAmarelo.png" alt="" fill className="object-cover" />
-            </span>
+            />
             <span className="relative z-10 text-black">{label}</span>
           </button>
         );

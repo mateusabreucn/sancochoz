@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import PhoneField from "./PhoneField";
 
 function ErrorTooltip({
@@ -165,7 +164,11 @@ export default function ContactForm() {
             />
             {!messageValue && !messageFocused && (
               <span className="absolute inset-0 flex items-center justify-center text-center text-sm text-text-muted pointer-events-none px-6">
-                Short or long message, I&apos;m here to understand your project.
+                <span className="lg:hidden">tell me your idea</span>
+                <span className="hidden lg:inline">
+                  Short or long message, I&apos;m here to understand your
+                  project.
+                </span>
               </span>
             )}
             <ErrorTooltip
@@ -186,13 +189,13 @@ export default function ContactForm() {
             active:translate-y-0 active:translate-x-0 active:shadow-none
             whitespace-nowrap disabled:opacity-60"
         >
-          <span className="absolute inset-0 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-200 pointer-events-none">
-            <Image src="/FundoAmarelo.png" alt="" fill className="object-cover" />
+          <span className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-200 pointer-events-none" />
+          <span className="relative z-10">
+            {status === "sending" ? "sending..." : "send"}
           </span>
-          <span className="relative z-10">{status === "sending" ? "sending..." : "send"}</span>
         </button>
 
-        <p className="text-center text-xs font-body text-black/40 -mt-4">
+        <p className="text-center text-xs font-body text-black/40 -mt-4 mx-14 lg:mx-0">
           by sending, you authorize the use of your contact data
         </p>
 
