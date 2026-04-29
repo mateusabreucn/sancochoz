@@ -10,26 +10,26 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1038.0",
-    "@hookform/resolvers": "^3.3.0",
-    "framer-motion": "^11.0.0",
-    "gsap": "^3.12.0",
-    "next": "^14.2.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
-    "react-hook-form": "^7.51.0",
-    "resend": "^3.2.0",
+    "@hookform/resolvers": "^3.10.0",
+    "framer-motion": "^11.18.2",
+    "gsap": "^3.15.0",
+    "next": "^14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.74.0",
+    "resend": "^3.5.0",
     "server-only": "^0.0.1",
-    "zod": "^3.22.0"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "autoprefixer": "^10.4.0",
-    "eslint": "^8.56.0",
-    "eslint-config-next": "^14.2.0",
-    "postcss": "^8.4.0",
-    "tailwindcss": "^3.4.0",
-    "typescript": "^5.3.0"
+    "@types/node": "^20.19.39",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "autoprefixer": "^10.5.0",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.35",
+    "postcss": "^8.5.12",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3"
   }
 }
