@@ -1,146 +1,70 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import gsap from "gsap";
+import { useRef, useEffect, useMemo } from "react";
+import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
+import { VideoCardDesktop } from "./VideoCardDesktop";
 import CategoryFilter from "./CategoryFilter";
-import VideoCard from "./VideoCard";
-import { videoData, Category } from "./showcaseData";
+import { useMarquee } from "./useMarquee";
+import { videoData } from "./showcaseData";
+
+const CARD_W = 300;
 
 export default function ShowcaseDesktop() {
-  const [activeCategory, setActiveCategory] = useState<Category>("videomaking");
-  const [isAnyHovered, setIsAnyHovered] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
+  const state = useShowcaseState();
+  const dispatch = useShowcaseDispatch();
   const trackRef = useRef<HTMLDivElement>(null);
-  const autoScrollRef = useRef<gsap.core.Tween | null>(null);
-  const velocityRef = useRef(0);
-  const lastXRef = useRef(0);
-  const translateXRef = useRef(0);
-  const draggingRef = useRef(false);
-  const singleSetWidthRef = useRef(0);
 
-  const videos = videoData[activeCategory];
-  const displayVideos = [...videos, ...videos];
+  const videos = videoData[state.category];
 
-  const getSingleSetWidth = useCallback(() => {
-    if (!trackRef.current) return 0;
-    const children = trackRef.current.children;
-    let w = 0;
-    for (let i = 0; i < videos.length && i < children.length; i++) {
-      w += (children[i] as HTMLElement).offsetWidth;
-    }
-    return w;
+  // Enough copies to always fill the viewport with some overflow
+  const copies = useMemo(() => {
+    const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
+    return Math.max(2, Math.ceil((vw * 2) / (videos.length * CARD_W)) + 1);
   }, [videos.length]);
 
-  const wrapPosition = useCallback((x: number) => {
-    const sw = singleSetWidthRef.current;
-    if (sw <= 0) return x;
-    if (x > 0) return x - sw;
-    if (x < -sw) return x + sw;
-    return x;
-  }, []);
+  const displayVideos = useMemo(
+    () => Array.from({ length: copies * videos.length }, (_, i) => videos[i % videos.length]),
+    [videos, copies]
+  );
 
-  const startAutoScroll = useCallback(() => {
-    if (autoScrollRef.current) autoScrollRef.current.kill();
-    const singleSetWidth = getSingleSetWidth();
-    singleSetWidthRef.current = singleSetWidth;
-    autoScrollRef.current = gsap.to(trackRef.current, {
-      x: -singleSetWidth,
-      duration: singleSetWidth / 40,
-      ease: "none",
-      repeat: -1,
-    });
-  }, [getSingleSetWidth]);
+  useMarquee({
+    trackRef,
+    paused: state.activeVideoId !== null,
+    pxPerSecond: 30,
+    category: state.category,
+    itemCount: videos.length,
+    enableDrag: false,
+  });
 
+  // Reset active on pointer leave, tab switch, and window blur
   useEffect(() => {
-    const timer = setTimeout(() => {
-      gsap.set(trackRef.current, { x: 0 });
-      translateXRef.current = 0;
-      singleSetWidthRef.current = getSingleSetWidth();
-      startAutoScroll();
-    }, 150);
+    const reset = () => dispatch({ type: "RESET_ACTIVE" });
+    const onVisibility = () => { if (document.hidden) reset(); };
+    window.addEventListener("blur", reset);
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      clearTimeout(timer);
-      if (autoScrollRef.current) autoScrollRef.current.kill();
+      window.removeEventListener("blur", reset);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [activeCategory, startAutoScroll, getSingleSetWidth]);
-
-  useEffect(() => {
-    if (!autoScrollRef.current) return;
-    if (isAnyHovered || isDragging) {
-      autoScrollRef.current.pause();
-    } else {
-      autoScrollRef.current.resume();
-    }
-  }, [isAnyHovered, isDragging]);
-
-  useEffect(() => {
-    const handleMove = (e: PointerEvent) => {
-      if (!draggingRef.current || !trackRef.current) return;
-      const dx = e.clientX - lastXRef.current;
-      lastXRef.current = e.clientX;
-      velocityRef.current = dx;
-      const currentX = gsap.getProperty(trackRef.current, "x") as number;
-      const newX = wrapPosition(currentX + dx);
-      translateXRef.current = newX;
-      gsap.set(trackRef.current, { x: newX });
-    };
-
-    const handleUp = () => {
-      if (!draggingRef.current) return;
-      draggingRef.current = false;
-      setIsDragging(false);
-      const momentum = velocityRef.current * 10;
-      const wrappedTarget = wrapPosition(translateXRef.current + momentum);
-      gsap.to(trackRef.current, {
-        x: wrappedTarget,
-        duration: 0.8,
-        ease: "power2.out",
-        onComplete: () => {
-          translateXRef.current = gsap.getProperty(trackRef.current, "x") as number;
-          startAutoScroll();
-        },
-      });
-    };
-
-    document.addEventListener("pointermove", handleMove);
-    document.addEventListener("pointerup", handleUp);
-    return () => {
-      document.removeEventListener("pointermove", handleMove);
-      document.removeEventListener("pointerup", handleUp);
-    };
-  }, [wrapPosition, startAutoScroll]);
-
-  const onPointerDown = (e: React.PointerEvent) => {
-    e.preventDefault();
-    draggingRef.current = true;
-    setIsDragging(true);
-    lastXRef.current = e.clientX;
-    velocityRef.current = 0;
-    translateXRef.current = wrapPosition(gsap.getProperty(trackRef.current, "x") as number);
-    singleSetWidthRef.current = getSingleSetWidth();
-    if (autoScrollRef.current) autoScrollRef.current.pause();
-  };
+  }, [dispatch]);
 
   return (
     <section className="relative w-full overflow-x-clip">
       <div
-        className="relative h-[600px] cursor-grab active:cursor-grabbing select-none"
-        onPointerDown={onPointerDown}
+        className="relative h-[600px] select-none"
+        onPointerLeave={() => dispatch({ type: "RESET_ACTIVE" })}
       >
-        <div ref={trackRef} className="flex gap-0 h-full absolute left-0 top-0">
+        <div ref={trackRef} className="flex h-full absolute left-0 top-0">
           {displayVideos.map((video, i) => (
-            <VideoCard
-              key={`${activeCategory}-${video.title}-${i}`}
-              src={video.src}
-              title={video.title}
-              isAnyHovered={isAnyHovered}
-              onHoverStart={() => setIsAnyHovered(true)}
-              onHoverEnd={() => setIsAnyHovered(false)}
+            <VideoCardDesktop
+              key={`${video.id}-${i}`}
+              entry={video}
+              cardId={`${video.id}-${i}`}
             />
           ))}
         </div>
 
-        <CategoryFilter active={activeCategory} onChange={setActiveCategory} />
+        <CategoryFilter />
       </div>
     </section>
   );

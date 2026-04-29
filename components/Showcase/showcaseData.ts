@@ -1,23 +1,54 @@
-export type Category = "webdesign" | "socialmedia" | "videomaking";
+import { VideoEntry, Category } from "./showcase.types";
 
-export const videoData: Record<Category, { src: string; title: string }[]> = {
-  socialmedia: [
-    { src: "/ShowcaseVideos/SocialMedia/APIPC.mp4", title: "APIPC" },
-    { src: "/ShowcaseVideos/SocialMedia/CHQ.mp4", title: "CHQ" },
-    { src: "/ShowcaseVideos/SocialMedia/Imagine.mp4", title: "Imagine" },
-    { src: "/ShowcaseVideos/SocialMedia/RioSambaXP.mp4", title: "RioSambaXP" },
-  ],
+function slugToTitle(filename: string): string {
+  return filename
+    .replace(/\.mp4$/i, "")
+    .replace(/^\d+[-_]?/, "")
+    .replace(/[-_]/g, " ")
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function makeId(category: Category, filename: string): string {
+  const slug = filename
+    .replace(/\.mp4$/i, "")
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]/g, "")
+    .toLowerCase();
+  return `${category}-${slug}`;
+}
+
+const rawData: Record<Category, string[]> = {
+  socialmedia: ["APIPC.mp4", "CHQ.mp4", "Imagine.mp4", "RioSambaXP.mp4"],
   videomaking: [
-    { src: "/ShowcaseVideos/Videomaking/Alameda.mp4", title: "Alameda" },
-    { src: "/ShowcaseVideos/Videomaking/Boat Party.mp4", title: "Boat Party" },
-    { src: "/ShowcaseVideos/Videomaking/Flora.mp4", title: "Flora" },
-    { src: "/ShowcaseVideos/Videomaking/Imagine Eventos.mp4", title: "Imagine Eventos" },
-    { src: "/ShowcaseVideos/Videomaking/James.mp4", title: "James" },
-    { src: "/ShowcaseVideos/Videomaking/Minha Infância.mp4", title: "Minha Infância" },
-    { src: "/ShowcaseVideos/Videomaking/RioSamba.mp4", title: "RioSamba" },
-    { src: "/ShowcaseVideos/Videomaking/Spot Alameda.mp4", title: "Spot Alameda" },
+    "Alameda.mp4",
+    "Boat Party.mp4",
+    "Flora.mp4",
+    "Imagine Eventos.mp4",
+    "James.mp4",
+    "Minha Infância.mp4",
+    "RioSamba.mp4",
+    "Spot Alameda.mp4",
   ],
-  webdesign: [
-    { src: "/ShowcaseVideos/Website/Amanda.mp4", title: "Amanda" },
-  ],
+  webdesign: ["Amanda.mp4"],
 };
+
+const categoryPaths: Record<Category, string> = {
+  socialmedia: "/ShowcaseVideos/SocialMedia",
+  videomaking: "/ShowcaseVideos/Videomaking",
+  webdesign: "/ShowcaseVideos/Website",
+};
+
+export const videoData: Record<Category, VideoEntry[]> = Object.fromEntries(
+  (Object.entries(rawData) as [Category, string[]][]).map(
+    ([category, files]) => [
+      category,
+      files.map((filename) => ({
+        id: makeId(category, filename),
+        category,
+        src: `${categoryPaths[category]}/${encodeURIComponent(filename)}`,
+        title: slugToTitle(filename),
+      })),
+    ]
+  )
+) as Record<Category, VideoEntry[]>;
