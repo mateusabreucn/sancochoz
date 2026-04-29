@@ -7,6 +7,8 @@ export interface VideoEntry {
   title: string;
 }
 
+export type ShowcaseVideos = Record<Category, VideoEntry[]>;
+
 export interface ShowcaseState {
   category: Category;
   activeVideoId: string | null;
