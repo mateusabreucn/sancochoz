@@ -5,19 +5,24 @@ import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 import { VideoCardDesktop } from "./VideoCardDesktop";
 import CategoryFilter from "./CategoryFilter";
 import { useMarquee } from "./useMarquee";
-import { videoData } from "./showcaseData";
+import type { ShowcaseVideos } from "./showcase.types";
 
 const CARD_W = 300;
 
-export default function ShowcaseDesktop() {
+interface Props {
+  videosByCategory: ShowcaseVideos;
+}
+
+export default function ShowcaseDesktop({ videosByCategory }: Props) {
   const state = useShowcaseState();
   const dispatch = useShowcaseDispatch();
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const videos = videoData[state.category];
+  const videos = videosByCategory[state.category];
 
   // Enough copies to always fill the viewport with some overflow
   const copies = useMemo(() => {
+    if (videos.length === 0) return 0;
     const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
     return Math.max(2, Math.ceil((vw * 2) / (videos.length * CARD_W)) + 1);
   }, [videos.length]);
@@ -54,15 +59,23 @@ export default function ShowcaseDesktop() {
         className="relative h-[600px] select-none"
         onPointerLeave={() => dispatch({ type: "RESET_ACTIVE" })}
       >
-        <div ref={trackRef} className="flex h-full absolute left-0 top-0">
-          {displayVideos.map((video, i) => (
-            <VideoCardDesktop
-              key={`${video.id}-${i}`}
-              entry={video}
-              cardId={`${video.id}-${i}`}
-            />
-          ))}
-        </div>
+        {videos.length > 0 ? (
+          <div ref={trackRef} className="flex h-full absolute left-0 top-0">
+            {displayVideos.map((video, i) => (
+              <VideoCardDesktop
+                key={`${video.id}-${i}`}
+                entry={video}
+                cardId={`${video.id}-${i}`}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex h-full items-center justify-center bg-bg-alt px-8 text-center">
+            <p className="font-body text-lg font-semibold lowercase text-black">
+              em breve
+            </p>
+          </div>
+        )}
 
         <CategoryFilter />
       </div>

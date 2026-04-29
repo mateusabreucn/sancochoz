@@ -1,16 +1,10 @@
-import { ShowcaseProvider } from "./ShowcaseContext";
-import ShowcaseMobile from "./ShowcaseMobile";
-import ShowcaseDesktop from "./ShowcaseDesktop";
+import { listShowcaseVideos } from "@/lib/r2-client";
+import ShowcaseClient from "./ShowcaseClient";
 
-export default function Showcase() {
-  return (
-    <ShowcaseProvider>
-      <div className="lg:hidden">
-        <ShowcaseMobile />
-      </div>
-      <div className="hidden lg:block">
-        <ShowcaseDesktop />
-      </div>
-    </ShowcaseProvider>
-  );
+export const revalidate = 60;
+
+export default async function Showcase() {
+  const videos = await listShowcaseVideos();
+
+  return <ShowcaseClient videos={videos} />;
 }
