@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import PolaroidDeck from "./PolaroidDeck";
 
 function usePolaroidScale() {
@@ -23,9 +22,8 @@ export default function Hero() {
   const polaroidScale = usePolaroidScale();
 
   return (
-    <section className="my-32 lg:my-64">
+    <section className="my-32 lg:my-48">
       <div className="flex flex-col lg:grid lg:grid-cols-3 items-center gap-10 lg:gap-8 max-w-[1400px] mx-auto px-6 lg:px-0">
-
         {/* Tagline — mobile: acima do polaroid | desktop: coluna esquerda */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -54,7 +52,12 @@ export default function Hero() {
               marginLeft: 20 * polaroidScale,
             }}
           >
-            <div style={{ transform: `scale(${polaroidScale})`, transformOrigin: "top left" }}>
+            <div
+              style={{
+                transform: `scale(${polaroidScale})`,
+                transformOrigin: "top left",
+              }}
+            >
               <PolaroidDeck />
             </div>
           </div>
@@ -86,13 +89,10 @@ export default function Hero() {
               whitespace-nowrap cursor-pointer
             "
           >
-            <span className="absolute inset-0 opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-200 pointer-events-none">
-              <Image src="/FundoAmarelo.png" alt="" fill className="object-cover" />
-            </span>
+            <span className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-200 pointer-events-none" />
             <span className="relative z-10">talk to me</span>
           </a>
         </motion.div>
-
       </div>
     </section>
   );

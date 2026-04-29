@@ -6,15 +6,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 const LogoBg = () => (
-  <div className="absolute inset-0 -z-10 overflow-hidden">
-    <Image src="/FundoAmarelo.png" alt="" fill className="object-cover" />
-  </div>
+  <div className="absolute inset-0 -z-10 bg-accent" />
 );
 
 const LogoBgMotion = ({ opacity }: { opacity: MotionValue<number> }) => (
-  <motion.div className="absolute inset-0 -z-10 overflow-hidden" style={{ opacity }}>
-    <Image src="/FundoAmarelo.png" alt="" fill className="object-cover" />
-  </motion.div>
+  <motion.div className="absolute inset-0 -z-10 bg-accent" style={{ opacity }} />
 );
 
 interface HeaderProps {
