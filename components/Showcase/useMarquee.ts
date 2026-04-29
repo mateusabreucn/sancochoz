@@ -27,6 +27,11 @@ export function useMarquee({
   const singleSetWidthRef = useRef(0);
   const pausedRef = useRef(paused);
   const dispatchRef = useRef(dispatch);
+  const reducedMotionRef = useRef(
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false
+  );
 
   useEffect(() => { pausedRef.current = paused; }, [paused]);
   useEffect(() => { dispatchRef.current = dispatch; }, [dispatch]);
@@ -41,6 +46,7 @@ export function useMarquee({
 
   const startMarquee = useCallback(() => {
     if (!trackRef.current) return;
+    if (reducedMotionRef.current) return;
     const sw = computeWidth();
     if (sw === 0) return;
     singleSetWidthRef.current = sw;
@@ -85,6 +91,23 @@ export function useMarquee({
     ro.observe(parent);
     return () => ro.disconnect();
   }, [trackRef, startMarquee]);
+
+  // Respect prefers-reduced-motion changes at runtime
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handler = (e: MediaQueryListEvent) => {
+      reducedMotionRef.current = e.matches;
+      if (e.matches) {
+        tweenRef.current?.kill();
+        tweenRef.current = null;
+      } else {
+        requestAnimationFrame(startMarquee);
+      }
+    };
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, [startMarquee]);
 
   // Drag (mobile only)
   useEffect(() => {
@@ -133,7 +156,6 @@ export function useMarquee({
         ease: "power2.out",
         onComplete: () => {
           dispatchRef.current?.({ type: "SET_DRAGGING", dragging: false });
-          // Re-start marquee cleanly after momentum settles
           requestAnimationFrame(startMarquee);
         },
       });

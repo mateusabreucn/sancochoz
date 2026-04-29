@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 import { VideoCardDesktop } from "./VideoCardDesktop";
 import CategoryFilter from "./CategoryFilter";
@@ -17,6 +17,8 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
   const state = useShowcaseState();
   const dispatch = useShowcaseDispatch();
   const trackRef = useRef<HTMLDivElement>(null);
+  const [trackVisible, setTrackVisible] = useState(true);
+  const firstRender = useRef(true);
 
   const videos = videosByCategory[state.category];
 
@@ -53,6 +55,17 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
     };
   }, [dispatch]);
 
+  // Fade out/in on category change
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    setTrackVisible(false);
+    const id = setTimeout(() => setTrackVisible(true), 150);
+    return () => clearTimeout(id);
+  }, [state.category]);
+
   return (
     <section className="relative w-full overflow-x-clip">
       <div
@@ -60,12 +73,17 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
         onPointerLeave={() => dispatch({ type: "RESET_ACTIVE" })}
       >
         {videos.length > 0 ? (
-          <div ref={trackRef} className="flex h-full absolute left-0 top-0">
+          <div
+            ref={trackRef}
+            className="flex h-full absolute left-0 top-0 transition-opacity duration-150 motion-reduce:transition-none"
+            style={{ opacity: trackVisible ? 1 : 0 }}
+          >
             {displayVideos.map((video, i) => (
               <VideoCardDesktop
                 key={`${video.id}-${i}`}
                 entry={video}
                 cardId={`${video.id}-${i}`}
+                stackIndex={i}
               />
             ))}
           </div>

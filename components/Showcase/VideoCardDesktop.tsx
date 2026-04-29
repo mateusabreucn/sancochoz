@@ -9,13 +9,14 @@ import { VideoSkeleton } from "./Skeleton";
 interface Props {
   entry: VideoEntry;
   cardId: string;
+  stackIndex: number;
 }
 
 const INACTIVE_W = 300;
 const ACTIVE_W = 400;
 const ACTIVE_H = `${Math.round(ACTIVE_W * (16 / 9))}px`;
 
-export function VideoCardDesktop({ entry, cardId }: Props) {
+export function VideoCardDesktop({ entry, cardId, stackIndex }: Props) {
   const state = useShowcaseState();
   const dispatch = useShowcaseDispatch();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -73,7 +74,7 @@ export function VideoCardDesktop({ entry, cardId }: Props) {
         boxShadow: isActive
           ? "0 0 40px 10px rgba(0,0,0,0.45), -20px 0 20px -5px rgba(0,0,0,0.3)"
           : "-20px 0 20px -5px rgba(0,0,0,0.3)",
-        zIndex: isActive ? 30 : 0,
+        zIndex: isActive ? 1000 : stackIndex,
       }}
       onMouseEnter={() => dispatch({ type: "SET_ACTIVE", id: cardId })}
     >
