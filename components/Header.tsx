@@ -130,10 +130,10 @@ export default function Header({ variant = "default" }: HeaderProps) {
               <button
                 onClick={() => setMenuOpen(true)}
                 aria-label="Abrir menu"
-                className="flex flex-col items-center gap-[6px]"
+                className="flex flex-col items-center gap-1.5"
               >
-                <Image src="/Polaroid/FitaPreta.png" alt="" width={32} height={5} className="w-7 h-[5px] object-cover" />
-                <Image src="/Polaroid/FitaPreta.png" alt="" width={32} height={5} className="w-7 h-[5px] object-cover" />
+                <span className="block w-7 h-0.5 bg-black" />
+                <span className="block w-7 h-0.5 bg-black" />
               </button>
             )}
           </motion.div>

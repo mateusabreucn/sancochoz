@@ -128,11 +128,6 @@ export function VideoCardDesktop({ entry, cardId, stackIndex }: Props) {
         </button>
       )}
 
-      {isActive && (
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/50 to-transparent pointer-events-none">
-          <p className="text-white text-sm font-medium">{entry.title}</p>
-        </div>
-      )}
     </div>
   );
 }
