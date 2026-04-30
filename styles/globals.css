@@ -23,6 +23,107 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Page loader */
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.page-loader-panel {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  background-color: #E8E6E1;
+}
+
+.page-loader-left  { left: 0; }
+.page-loader-right { right: 0; }
+
+.page-loader-seam {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* translate(-50%,-50%) set inline in JSX so server HTML is correct from first byte */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+.loader-track {
+  position: relative;
+  margin-top: 0.75rem;
+  width: 180px;
+  height: 6px;
+  background: transparent;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.loader-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 35%;
+  background-color: #0A0A0A;
+  border-radius: 999px;
+}
+
+/* Showcase curtain (category transition) */
+.showcase-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.curtain-panel {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  background-color: #E8E6E1;
+  box-shadow:
+    inset 0  20px 40px -10px rgba(0,0,0,0.18),
+    inset 0 -20px 40px -10px rgba(0,0,0,0.18);
+}
+
+.curtain-left  { left: 0; }
+.curtain-right { right: 0; }
+
+.curtain-logo {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  /* GSAP controls transform — xPercent/yPercent center it on the seam */
+}
+
+/* Mobile showcase curtain */
+.showcase-mobile-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.mobile-curtain-panel {
+  position: absolute;
+  inset: 0;
+  background-color: #E8E6E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0  20px 40px -10px rgba(0,0,0,0.18),
+    inset 0 -20px 40px -10px rgba(0,0,0,0.18);
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
