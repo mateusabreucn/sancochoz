@@ -35,7 +35,9 @@ export default function RootLayout({
         className={`${inter.variable} ${permanentMarker.variable} font-body bg-bg`}
       >
         <PageLoader />
-        {children}
+        <div className="max-w-screen-3xl mx-auto">
+          {children}
+        </div>
       </body>
     </html>
   );
