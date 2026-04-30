@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useLang } from "@/context/LanguageContext";
 
 const aboutText = {
   en: {
@@ -13,6 +13,8 @@ const aboutText = {
     line5: "a way to build a brand",
     line6: "without the pressure of performance",
     line7: "because authenticity hits",
+    line8: "I'm Gustavo Azevedo",
+    line9: "I move between film, photography, and digital spaces, creating visual content that feel cohesive, intentional, and alive",
   },
   pt: {
     line1: "sancochoz vem do sentimento",
@@ -22,54 +24,33 @@ const aboutText = {
     line5: "uma forma de construir marca",
     line6: "sem a pressão da performance",
     line7: "porque o que é de verdade funciona",
+    line8: "Sou Gustavo Azevedo",
+    line9: "Entre o vídeo, a fotografia e o digital, crio conteúdos visuais que são coesos, intencionais e vivos",
   },
 } as const;
 
-type Lang = keyof typeof aboutText;
-
 export default function AboutPage() {
-  const [lang, setLang] = useState<Lang>("en");
-  const t = aboutText[lang];
+  const { lang } = useLang();
+  const text = aboutText[lang];
 
   const lines = [
-    t.line1,
-    t.line2,
+    text.line1,
+    text.line2,
     "",
-    t.line3,
-    t.line4,
+    text.line3,
+    text.line4,
     "",
-    t.line5,
-    t.line6,
-    t.line7,
+    text.line5,
+    text.line6,
+    text.line7,
+    "",
+    text.line8,
+    text.line9,
   ];
-  const langIndex = lang === "en" ? 0 : 1;
 
   return (
     <div className="flex-1 flex flex-col">
       <div className="w-[85vw] md:w-2/3 flex flex-col mx-auto mt-14 md:mt-20 gap-8 lg:gap-0 pb-12">
-        {/* Language Toggle */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative grid grid-cols-2 w-24 md:w-32 md:-ml-8"
-        >
-          <motion.div
-            className="absolute top-0 left-0 h-full w-1/2 bg-gray-soft"
-            animate={{ x: `${langIndex * 100}%` }}
-            transition={{ type: "spring", stiffness: 500, damping: 35 }}
-          />
-          {(["en", "pt"] as Lang[]).map((l) => (
-            <button
-              key={l}
-              onClick={() => setLang(l)}
-              className="relative z-10 font-body font-extralight text-sm md:text-lg text-black px-4 py-2 text-center"
-            >
-              {l.toUpperCase()}
-            </button>
-          ))}
-        </motion.div>
-
         {/* Grid: text + logo */}
         <div className="w-full flex flex-col items-center md:grid md:grid-cols-2 gap-8 md:gap-12 md:items-center">
           <motion.div
@@ -84,7 +65,7 @@ export default function AboutPage() {
               ) : (
                 <p
                   key={i}
-                  className="font-body text-[clamp(0.85rem,1.5vw,1.2rem)] text-text-muted leading-[1.8]"
+                  className={`font-body text-[clamp(0.85rem,1.5vw,1.2rem)] text-text-muted leading-[1.8]${i >= lines.length - 2 ? " whitespace-normal" : ""}`}
                 >
                   {line}
                 </p>

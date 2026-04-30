@@ -3,9 +3,10 @@
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PhoneField from "./PhoneField";
+import { useLang } from "@/context/LanguageContext";
 
 function ErrorTooltip({
   message,
@@ -33,23 +34,29 @@ function ErrorTooltip({
   );
 }
 
-const contactSchema = z.object({
-  name: z.string().min(1, "what's your name?").max(80, "name is too long"),
-  phone: z.string().min(1, "what's your phone?").max(30, "phone is too long"),
-  email: z
-    .string()
-    .min(1, "your e-mail plz")
-    .max(120, "e-mail is too long")
-    .email("this doesn't look like a valid e-mail"),
-  message: z.string().min(1, "tell us about your project").max(2000),
-});
-
-type ContactData = z.infer<typeof contactSchema>;
-
 export default function ContactForm() {
-  const [status, setStatus] = useState<
-    "idle" | "sending" | "success" | "error"
-  >("idle");
+  const { t } = useLang();
+  const e = t.contact.errors;
+
+  const contactSchema = useMemo(
+    () =>
+      z.object({
+        name: z.string().min(1, e.nameRequired).max(80, e.nameTooLong),
+        phone: z.string().min(1, e.phoneRequired).max(30, e.phoneTooLong),
+        email: z
+          .string()
+          .min(1, e.emailRequired)
+          .max(120, e.emailTooLong)
+          .email(e.emailInvalid),
+        message: z.string().min(1, e.messageRequired).max(2000),
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t],
+  );
+
+  type ContactData = z.infer<typeof contactSchema>;
+
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
   const {
     register,
@@ -90,7 +97,7 @@ export default function ContactForm() {
   return (
     <section id="contact" className="py-24 mx-4 lg:mx-12">
       <h2 className="font-body font-medium text-[clamp(1.5rem,3vw,2rem)] text-center mb-10 text-black">
-        talk to me
+        {t.contact.heading}
       </h2>
 
       <form
@@ -102,7 +109,7 @@ export default function ContactForm() {
         <div className="relative">
           <input
             {...register("name")}
-            placeholder="name"
+            placeholder={t.contact.name}
             maxLength={80}
             className={`${inputClasses} ${errors.name ? inputErrorClasses : ""}`}
           />
@@ -122,7 +129,7 @@ export default function ContactForm() {
                 <PhoneField
                   value={field.value || ""}
                   onChange={field.onChange}
-                  placeholder="phone"
+                  placeholder={t.contact.phone}
                   focused={phoneFocused}
                   onFocus={() => setPhoneFocused(true)}
                   onBlur={() => setPhoneFocused(false)}
@@ -138,7 +145,7 @@ export default function ContactForm() {
           <input
             {...register("email")}
             type="text"
-            placeholder="e-mail"
+            placeholder={t.contact.email}
             maxLength={120}
             className={`${inputClasses} ${errors.email ? inputErrorClasses : ""}`}
           />
@@ -164,11 +171,8 @@ export default function ContactForm() {
             />
             {!messageValue && !messageFocused && (
               <span className="absolute inset-0 flex items-center justify-center text-center text-sm text-text-muted pointer-events-none px-6">
-                <span className="lg:hidden">tell me your idea</span>
-                <span className="hidden lg:inline">
-                  Short or long message, I&apos;m here to understand your
-                  project.
-                </span>
+                <span className="lg:hidden">{t.contact.messageMobile}</span>
+                <span className="hidden lg:inline">{t.contact.messageDesktop}</span>
               </span>
             )}
             <ErrorTooltip
@@ -191,22 +195,22 @@ export default function ContactForm() {
         >
           <span className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-200 pointer-events-none" />
           <span className="relative z-10">
-            {status === "sending" ? "sending..." : "send"}
+            {status === "sending" ? t.contact.sending : t.contact.send}
           </span>
         </button>
 
         <p className="text-center text-xs font-body text-black/40 -mt-4 mx-14 lg:mx-0">
-          by sending, you authorize the use of your contact data
+          {t.contact.consent}
         </p>
 
         {status === "success" && (
           <div className="self-center bg-black text-white text-xs font-body px-6 py-2">
-            thanks — i&apos;ll be in touch ASAP
+            {t.contact.success}
           </div>
         )}
         {status === "error" && (
           <div className="self-center bg-black text-white text-xs font-body px-6 py-2">
-            something went wrong — please try again
+            {t.contact.error}
           </div>
         )}
       </form>

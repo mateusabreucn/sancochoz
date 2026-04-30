@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { useLang } from "@/context/LanguageContext";
 
 const cookieText = {
   en: {
@@ -100,39 +100,13 @@ const cookieText = {
   },
 } as const;
 
-type Lang = keyof typeof cookieText;
-
 export default function PrivacyPage() {
-  const [lang, setLang] = useState<Lang>("pt");
+  const { lang } = useLang();
   const t = cookieText[lang];
-  const langIndex = lang === "en" ? 0 : 1;
 
   return (
     <div className="flex-1 flex flex-col">
       <div className="w-[85vw] md:w-2/3 flex flex-col mx-auto mt-14 md:mt-20 pb-12">
-        {/* Language Toggle */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative grid grid-cols-2 w-24 md:w-32 md:-ml-8 mb-8"
-        >
-          <motion.div
-            className="absolute top-0 left-0 h-full w-1/2 bg-gray-soft"
-            animate={{ x: `${langIndex * 100}%` }}
-            transition={{ type: "spring", stiffness: 500, damping: 35 }}
-          />
-          {(["en", "pt"] as Lang[]).map((l) => (
-            <button
-              key={l}
-              onClick={() => setLang(l)}
-              className="relative z-10 font-body font-extralight text-sm md:text-lg text-black px-4 py-2 text-center"
-            >
-              {l.toUpperCase()}
-            </button>
-          ))}
-        </motion.div>
-
         {/* Title */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}

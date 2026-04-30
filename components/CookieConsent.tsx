@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useLang } from "@/context/LanguageContext";
 
 const STORAGE_KEY = "cookie-consent";
 const DELAY_MS = 2200;
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const { t } = useLang();
 
   useEffect(() => {
     if (localStorage.getItem(STORAGE_KEY)) return;
@@ -37,10 +39,9 @@ export function CookieConsent() {
 
       <div className="bg-white-soft shadow-[4px_4px_0px] p-4 flex flex-col gap-3">
         <p className="font-body text-xs text-black leading-relaxed">
-          We use cookies to analyze site traffic and improve your experience.
-          By continuing, you agree to our{" "}
+          {t.cookie.message}{" "}
           <a href="/privacy" className="underline underline-offset-2">
-            cookie policy
+            {t.cookie.policy}
           </a>
           .
         </p>
@@ -50,13 +51,13 @@ export function CookieConsent() {
             onClick={() => respond("accepted")}
             className="flex-1 py-2 bg-black text-white font-body text-xs tracking-wide transition-colors hover:bg-black/80 active:bg-black/60"
           >
-            Accept
+            {t.cookie.accept}
           </button>
           <button
             onClick={() => respond("rejected")}
             className="flex-1 py-2 border-2 border-black font-body text-xs tracking-wide transition-colors hover:bg-black/5 active:bg-black/10"
           >
-            Reject
+            {t.cookie.reject}
           </button>
         </div>
       </div>

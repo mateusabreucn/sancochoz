@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import PolaroidDeck from "./PolaroidDeck";
+import { useLang } from "@/context/LanguageContext";
 
 function usePolaroidScale() {
   const [scale, setScale] = useState(0.75);
@@ -20,6 +21,7 @@ function usePolaroidScale() {
 
 export default function Hero() {
   const polaroidScale = usePolaroidScale();
+  const { t } = useLang();
 
   return (
     <section className="mb-36 my-28 lg:my-44">
@@ -32,7 +34,12 @@ export default function Hero() {
           className="flex justify-center lg:justify-end lg:pr-8 text-center lg:text-right order-1"
         >
           <p className="text-base lg:text-lg font-light lowercase text-black/80">
-            let&apos;s make projects we believe in
+            {t.hero.taglineBefore}
+            <span className="relative inline-block">
+              <span className="absolute bottom-0.5 left-0 right-0 h-[0.6em] bg-accent -z-10" />
+              {t.hero.taglineHighlight}
+            </span>
+            {t.hero.taglineAfter}
           </p>
         </motion.div>
 
@@ -90,7 +97,7 @@ export default function Hero() {
             "
           >
             <span className="absolute inset-0 bg-accent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-200 pointer-events-none" />
-            <span className="relative z-10">talk to me</span>
+            <span className="relative z-10">{t.hero.cta}</span>
           </a>
         </motion.div>
       </div>

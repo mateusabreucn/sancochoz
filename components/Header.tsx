@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { useLang } from "@/context/LanguageContext";
+import type { Lang } from "@/lib/i18n/translations";
 
 const LogoBg = () => (
   <div className="absolute inset-0 -z-10 bg-accent" />
@@ -29,6 +31,29 @@ const navLinkClass =
   "after:h-[0.45em] after:bg-accent after:-z-10 after:opacity-0 " +
   "hover:after:opacity-100 after:transition-opacity after:duration-200";
 
+function LangToggle() {
+  const { lang, setLang } = useLang();
+  const langIndex = lang === "en" ? 0 : 1;
+  return (
+    <div className="relative grid grid-cols-2 w-16 shrink-0">
+      <motion.div
+        className="absolute top-0 left-0 h-full w-1/2 bg-gray-soft"
+        animate={{ x: `${langIndex * 100}%` }}
+        transition={{ type: "spring", stiffness: 500, damping: 35 }}
+      />
+      {(["en", "pt"] as Lang[]).map((l) => (
+        <button
+          key={l}
+          onClick={() => setLang(l)}
+          className="relative z-10 font-body font-extralight text-xs text-black px-2 py-1.5 text-center"
+        >
+          {l.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 const LogoTitle = ({ size = "desktop" }: { size?: "mobile" | "desktop" }) => (
   <Image
     src="/LogoTitle.png"
@@ -42,6 +67,7 @@ const LogoTitle = ({ size = "desktop" }: { size?: "mobile" | "desktop" }) => (
 
 export default function Header({ variant = "default" }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useLang();
   const { scrollY } = useScroll();
   const titleRef = useRef<HTMLDivElement>(null);
   const [titleTranslate, setTitleTranslate] = useState(0);
@@ -95,10 +121,10 @@ export default function Header({ variant = "default" }: HeaderProps) {
             </div>
           </motion.div>
 
-          <motion.div {...fade(0.3)} className="ml-auto">
+          <motion.div {...fade(0.3)} className="ml-auto flex items-center gap-3">
             {variant === "about" ? (
               <Link href="/" className={navLinkClass}>
-                HOME
+                {t.nav.home}
               </Link>
             ) : (
               <button
@@ -164,17 +190,18 @@ export default function Header({ variant = "default" }: HeaderProps) {
             {...fade(0.3)}
             className="ml-auto flex items-center gap-6"
           >
+            <LangToggle />
             {variant === "about" ? (
               <Link href="/" className={navLinkClass}>
-                HOME
+                {t.nav.home}
               </Link>
             ) : (
               <>
                 <Link href="/about" className={navLinkClass}>
-                  ABOUT
+                  {t.nav.about}
                 </Link>
                 <a href="#contact" className={navLinkClass}>
-                  CONTACT
+                  {t.nav.contact}
                 </a>
               </>
             )}
@@ -204,15 +231,16 @@ export default function Header({ variant = "default" }: HeaderProps) {
               onClick={() => setMenuOpen(false)}
               className={navLinkClass + " text-2xl"}
             >
-              ABOUT
+              {t.nav.about}
             </Link>
             <a
               href="#contact"
               onClick={() => setMenuOpen(false)}
               className={navLinkClass + " text-2xl"}
             >
-              CONTACT
+              {t.nav.contact}
             </a>
+            <LangToggle />
           </div>
         </motion.div>
       )}
