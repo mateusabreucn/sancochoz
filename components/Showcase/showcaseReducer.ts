@@ -1,15 +1,15 @@
 import { ShowcaseState, ShowcaseAction } from "./showcase.types";
 
 export const initialState: ShowcaseState = {
-  category: "videomaking",
+  category: "videoandphoto",
   activeVideoId: null,
-  globalMuted: true,
+  globalMuted: false,
   isDragging: false,
 };
 
 export function showcaseReducer(
   state: ShowcaseState,
-  action: ShowcaseAction
+  action: ShowcaseAction,
 ): ShowcaseState {
   switch (action.type) {
     case "SET_CATEGORY":

@@ -1,5 +1,6 @@
 import { Inter, Permanent_Marker } from "next/font/google";
 import "@/styles/globals.css";
+import { PageLoader } from "@/components/PageLoader";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,7 +34,10 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${permanentMarker.variable} font-body bg-bg`}
       >
-        {children}
+        <PageLoader />
+        <div className="max-w-screen-3xl mx-auto">
+          {children}
+        </div>
       </body>
     </html>
   );

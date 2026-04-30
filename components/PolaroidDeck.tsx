@@ -26,6 +26,7 @@ export default function PolaroidDeck() {
   const deckOrder = useRef([0, 1, 2, 3]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([null, null, null, null]);
   const isAnimating = useRef(false);
+  const pendingAdvance = useRef(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Set initial stack positions via GSAP
@@ -37,8 +38,12 @@ export default function PolaroidDeck() {
   }, []);
 
   const advance = useCallback(() => {
-    if (isAnimating.current) return;
+    if (isAnimating.current) {
+      pendingAdvance.current = true; // register intent, overwrite any prior pending
+      return;
+    }
     isAnimating.current = true;
+    pendingAdvance.current = false;
 
     const currentFront = deckOrder.current[0];
     const frontEl = cardRefs.current[currentFront];
@@ -76,6 +81,7 @@ export default function PolaroidDeck() {
           ];
           setFrontPhotoIdx(deckOrder.current[0]);
           isAnimating.current = false;
+          if (pendingAdvance.current) advance();
         },
       })
       .to(frontEl, {

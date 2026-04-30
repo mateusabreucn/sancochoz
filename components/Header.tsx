@@ -103,9 +103,11 @@ export default function Header({ variant = "default" }: HeaderProps) {
             ) : (
               <button
                 onClick={() => setMenuOpen(true)}
-                className="text-[13px] font-medium tracking-[0.08em] uppercase"
+                aria-label="Abrir menu"
+                className="flex flex-col items-center gap-[6px]"
               >
-                MENU
+                <Image src="/Polaroid/FitaPreta.png" alt="" width={32} height={5} className="w-7 h-[5px] object-cover" />
+                <Image src="/Polaroid/FitaPreta.png" alt="" width={32} height={5} className="w-7 h-[5px] object-cover" />
               </button>
             )}
           </motion.div>

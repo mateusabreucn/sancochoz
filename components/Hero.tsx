@@ -22,8 +22,8 @@ export default function Hero() {
   const polaroidScale = usePolaroidScale();
 
   return (
-    <section className="my-32 lg:my-48">
-      <div className="flex flex-col lg:grid lg:grid-cols-3 items-center gap-10 lg:gap-8 max-w-[1400px] mx-auto px-6 lg:px-0">
+    <section className="mb-36 my-28 lg:my-48">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 items-center gap-12 lg:gap-8 max-w-[1400px] mx-auto px-6 lg:px-0">
         {/* Tagline — mobile: acima do polaroid | desktop: coluna esquerda */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -49,7 +49,7 @@ export default function Hero() {
             style={{
               width: 330 * polaroidScale,
               height: 380 * polaroidScale,
-              marginLeft: 20 * polaroidScale,
+              marginLeft: 38 * polaroidScale,
             }}
           >
             <div
@@ -79,7 +79,7 @@ export default function Hero() {
             className="
               relative overflow-hidden group
               bg-white text-black font-semibold
-              text-sm px-12 py-2.5
+              text-sm px-12 py-1.5
               lg:text-base lg:px-20 lg:py-3
               border-2 border-transparent
               transition-all duration-200

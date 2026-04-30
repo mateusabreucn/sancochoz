@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect, useCallback } from "react";
+import gsap from "gsap";
 import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 import { VideoCardMobile } from "./VideoCardMobile";
 import CategoryFilter from "./CategoryFilter";
+import { ShowcaseMobileCurtain } from "./ShowcaseMobileCurtain";
 import { useMarquee } from "./useMarquee";
 import type { ShowcaseVideos } from "./showcase.types";
 
@@ -15,10 +17,12 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
   const state = useShowcaseState();
   const dispatch = useShowcaseDispatch();
   const trackRef = useRef<HTMLDivElement>(null);
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const [muted, setMuted] = useState(true);
+  const toggleMute = useCallback(() => setMuted(m => !m), []);
 
-  const videos = videosByCategory[state.category];
+  const videos = videosByCategory[state.category] ?? [];
 
-  // Mobile: each card is 100vw. Minimum 2 copies for seamless loop.
   const copies = videos.length === 0 ? 0 : Math.max(2, videos.length < 3 ? 4 : 2);
   const displayVideos = useMemo(
     () => Array.from({ length: copies * videos.length }, (_, i) => videos[i % videos.length]),
@@ -28,22 +32,48 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
   useMarquee({
     trackRef,
     paused: state.isDragging,
-    pxPerSecond: 60,
+    pxPerSecond: 80,
     category: state.category,
     itemCount: videos.length,
     enableDrag: true,
     dispatch,
   });
 
+  // Track which video is centered on screen based on marquee track position
+  useEffect(() => {
+    if (videos.length === 0) {
+      setActiveVideoId(null);
+      return;
+    }
+
+    const check = () => {
+      const track = trackRef.current;
+      if (!track) return;
+      const x = gsap.getProperty(track, "x") as number;
+      const vw = window.innerWidth;
+      const centeredIdx = Math.round(-x / vw);
+      const wrappedIdx = ((centeredIdx % videos.length) + videos.length) % videos.length;
+      const id = videos[wrappedIdx]?.id ?? null;
+      setActiveVideoId(prev => (prev === id ? prev : id));
+    };
+
+    check();
+    const interval = setInterval(check, 200);
+    return () => clearInterval(interval);
+  }, [videos]);
+
   return (
     <section className="relative w-full overflow-x-clip">
-      <div className="relative h-screen select-none">
+      <div className="relative h-screen select-none overflow-hidden">
         {videos.length > 0 ? (
           <div ref={trackRef} className="flex h-full absolute left-0 top-0">
             {displayVideos.map((video, i) => (
               <VideoCardMobile
                 key={`${video.id}-${i}`}
                 entry={video}
+                isActive={activeVideoId === video.id}
+                muted={muted}
+                onToggleMute={toggleMute}
               />
             ))}
           </div>
@@ -56,6 +86,7 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
         )}
 
         <CategoryFilter />
+        <ShowcaseMobileCurtain />
       </div>
     </section>
   );

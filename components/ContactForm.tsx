@@ -83,7 +83,7 @@ export default function ContactForm() {
   };
 
   const inputClasses =
-    "w-full h-14 lg:h-24 bg-white-soft border-2 border-transparent outline-none font-body text-sm text-black placeholder:text-text-muted placeholder:text-center text-center transition-all overflow-hidden px-6 focus:border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]";
+    "w-full h-11 lg:h-24 bg-white-soft border-2 border-transparent outline-none font-body text-sm text-black placeholder:text-text-muted placeholder:text-center text-center transition-all overflow-hidden px-6 focus:border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]";
 
   const inputErrorClasses = "ring-1 ring-red-400/60";
 
@@ -117,7 +117,7 @@ export default function ContactForm() {
             defaultValue=""
             render={({ field }) => (
               <div
-                className={`h-14 lg:h-24 bg-white-soft border-2 transition-all ${phoneFocused ? "border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" : "border-transparent"} ${errors.phone ? inputErrorClasses : ""}`}
+                className={`h-11 lg:h-24 bg-white-soft border-2 transition-all ${phoneFocused ? "border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" : "border-transparent"} ${errors.phone ? inputErrorClasses : ""}`}
               >
                 <PhoneField
                   value={field.value || ""}
@@ -182,7 +182,7 @@ export default function ContactForm() {
           type="submit"
           disabled={status === "sending"}
           className="relative overflow-hidden group self-center mt-4 bg-white text-black font-semibold
-            text-sm px-12 py-2.5 lg:text-base lg:px-20 lg:py-3
+            text-sm px-12 py-1.5 lg:text-base lg:px-20 lg:py-3
             border-2 border-transparent transition-all duration-200
             hover:border-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
             hover:-translate-y-1 hover:-translate-x-1

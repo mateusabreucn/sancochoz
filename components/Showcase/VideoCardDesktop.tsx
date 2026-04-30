@@ -9,13 +9,14 @@ import { VideoSkeleton } from "./Skeleton";
 interface Props {
   entry: VideoEntry;
   cardId: string;
+  stackIndex: number;
 }
 
-const INACTIVE_W = 300;
+const INACTIVE_W = 340;
 const ACTIVE_W = 400;
 const ACTIVE_H = `${Math.round(ACTIVE_W * (16 / 9))}px`;
 
-export function VideoCardDesktop({ entry, cardId }: Props) {
+export function VideoCardDesktop({ entry, cardId, stackIndex }: Props) {
   const state = useShowcaseState();
   const dispatch = useShowcaseDispatch();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -38,27 +39,49 @@ export function VideoCardDesktop({ entry, cardId }: Props) {
     return () => io.disconnect();
   }, [hasBeenInView]);
 
-  // Play / pause on active state change
+  // Three states:
+  // - no active card → all cards autoplay muted
+  // - this card is active → play with user's sound preference
+  // - another card is active → pause and reset
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (isActive) {
-      video.preload = "auto";
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-      video.currentTime = 0;
-      video.muted = true;
-      video.preload = "metadata";
-    }
-  }, [isActive]);
 
-  // Apply global mute when active
-  useEffect(() => {
+    if (state.activeVideoId === null) {
+      video.muted = true;
+      video.play().catch(() => {});
+      return;
+    }
+
+    if (isActive) {
+      // Change mute first — if already playing, this alone unmutes (no autoplay policy issue)
+      video.muted = state.globalMuted;
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+      return;
+    }
+
+    video.pause();
+    video.currentTime = 0;
+    video.muted = true;
+  }, [isActive, state.activeVideoId, state.globalMuted]);
+
+  const handleVideoLoaded = () => {
+    setVideoReady(true);
     const video = videoRef.current;
-    if (!video || !isActive) return;
-    video.muted = state.globalMuted;
-  }, [state.globalMuted, isActive]);
+    if (!video) return;
+    // Start playing as soon as loaded — state determines mute/pause
+    if (state.activeVideoId === null) {
+      video.muted = true;
+      video.play().catch(() => {});
+    } else if (isActive) {
+      video.muted = state.globalMuted;
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    }
+  };
 
   return (
     <div
@@ -71,9 +94,9 @@ export function VideoCardDesktop({ entry, cardId }: Props) {
         transition: "width 0.4s cubic-bezier(0.4,0,0.2,1), height 0.4s cubic-bezier(0.4,0,0.2,1)",
         filter: isDimmed ? "grayscale(1)" : "none",
         boxShadow: isActive
-          ? "0 0 40px 10px rgba(0,0,0,0.45), -20px 0 20px -5px rgba(0,0,0,0.3)"
-          : "-20px 0 20px -5px rgba(0,0,0,0.3)",
-        zIndex: isActive ? 30 : 0,
+          ? "-40px 0 30px -5px rgba(0,0,0,0.7)"
+          : "-20px 0 18px -8px rgba(0,0,0,0.55)",
+        zIndex: isActive ? 1000 : stackIndex,
       }}
       onMouseEnter={() => dispatch({ type: "SET_ACTIVE", id: cardId })}
     >
@@ -83,12 +106,12 @@ export function VideoCardDesktop({ entry, cardId }: Props) {
         <video
           ref={videoRef}
           src={entry.src}
-          preload="metadata"
+          preload="auto"
           loop
           playsInline
           muted
           className={`w-full h-full object-cover transition-opacity duration-300 ${videoReady ? "opacity-100" : "opacity-0"}`}
-          onLoadedData={() => setVideoReady(true)}
+          onLoadedData={handleVideoLoaded}
           onClick={() => dispatch({ type: "TOGGLE_MUTE" })}
         />
       )}

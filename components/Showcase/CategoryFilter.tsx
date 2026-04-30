@@ -4,7 +4,7 @@ import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 import { Category } from "./showcase.types";
 
 const categories: { key: Category; label: string }[] = [
-  { key: "videomaking", label: "Video/Photo" },
+  { key: "videoandphoto", label: "Video/Photo" },
   { key: "webdesign", label: "web design" },
   { key: "socialmedia", label: "social media" },
 ];

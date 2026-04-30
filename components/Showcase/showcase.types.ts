@@ -1,4 +1,4 @@
-export type Category = "videomaking" | "webdesign" | "socialmedia";
+export type Category = "videoandphoto" | "webdesign" | "socialmedia";
 
 export interface VideoEntry {
   id: string;

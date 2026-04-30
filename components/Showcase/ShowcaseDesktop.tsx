@@ -4,10 +4,11 @@ import { useRef, useEffect, useMemo } from "react";
 import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 import { VideoCardDesktop } from "./VideoCardDesktop";
 import CategoryFilter from "./CategoryFilter";
+import { ShowcaseCurtain } from "./ShowcaseCurtain";
 import { useMarquee } from "./useMarquee";
 import type { ShowcaseVideos } from "./showcase.types";
 
-const CARD_W = 300;
+const CARD_W = 340;
 
 interface Props {
   videosByCategory: ShowcaseVideos;
@@ -18,9 +19,8 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
   const dispatch = useShowcaseDispatch();
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const videos = videosByCategory[state.category];
+  const videos = videosByCategory[state.category] ?? [];
 
-  // Enough copies to always fill the viewport with some overflow
   const copies = useMemo(() => {
     if (videos.length === 0) return 0;
     const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
@@ -35,7 +35,7 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
   useMarquee({
     trackRef,
     paused: state.activeVideoId !== null,
-    pxPerSecond: 30,
+    pxPerSecond: 45,
     category: state.category,
     itemCount: videos.length,
     enableDrag: false,
@@ -66,6 +66,7 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
                 key={`${video.id}-${i}`}
                 entry={video}
                 cardId={`${video.id}-${i}`}
+                stackIndex={i}
               />
             ))}
           </div>
@@ -78,6 +79,7 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
         )}
 
         <CategoryFilter />
+        <ShowcaseCurtain />
       </div>
     </section>
   );
