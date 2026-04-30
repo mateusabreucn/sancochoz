@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useMemo, useState, useEffect } from "react";
+import { useRef, useMemo } from "react";
 import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 import { VideoCardMobile } from "./VideoCardMobile";
 import CategoryFilter from "./CategoryFilter";
+import { ShowcaseMobileCurtain } from "./ShowcaseMobileCurtain";
 import { useMarquee } from "./useMarquee";
 import type { ShowcaseVideos } from "./showcase.types";
 
@@ -15,12 +16,9 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
   const state = useShowcaseState();
   const dispatch = useShowcaseDispatch();
   const trackRef = useRef<HTMLDivElement>(null);
-  const [trackVisible, setTrackVisible] = useState(true);
-  const firstRender = useRef(true);
 
-  const videos = videosByCategory[state.category];
+  const videos = videosByCategory[state.category] ?? [];
 
-  // Mobile: each card is 100vw. Minimum 2 copies for seamless loop.
   const copies = videos.length === 0 ? 0 : Math.max(2, videos.length < 3 ? 4 : 2);
   const displayVideos = useMemo(
     () => Array.from({ length: copies * videos.length }, (_, i) => videos[i % videos.length]),
@@ -30,33 +28,18 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
   useMarquee({
     trackRef,
     paused: state.isDragging,
-    pxPerSecond: 60,
+    pxPerSecond: 80,
     category: state.category,
     itemCount: videos.length,
     enableDrag: true,
     dispatch,
   });
 
-  // Fade out/in on category change
-  useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-    setTrackVisible(false);
-    const id = setTimeout(() => setTrackVisible(true), 150);
-    return () => clearTimeout(id);
-  }, [state.category]);
-
   return (
     <section className="relative w-full overflow-x-clip">
-      <div className="relative h-screen select-none">
+      <div className="relative h-screen select-none overflow-hidden">
         {videos.length > 0 ? (
-          <div
-            ref={trackRef}
-            className="flex h-full absolute left-0 top-0 transition-opacity duration-150 motion-reduce:transition-none"
-            style={{ opacity: trackVisible ? 1 : 0 }}
-          >
+          <div ref={trackRef} className="flex h-full absolute left-0 top-0">
             {displayVideos.map((video, i) => (
               <VideoCardMobile
                 key={`${video.id}-${i}`}
@@ -73,6 +56,7 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
         )}
 
         <CategoryFilter />
+        <ShowcaseMobileCurtain />
       </div>
     </section>
   );
