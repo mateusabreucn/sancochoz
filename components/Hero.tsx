@@ -22,7 +22,7 @@ export default function Hero() {
   const polaroidScale = usePolaroidScale();
 
   return (
-    <section className="mb-36 my-28 lg:my-48">
+    <section className="mb-36 my-28 lg:my-44">
       <div className="flex flex-col lg:grid lg:grid-cols-3 items-center gap-12 lg:gap-8 max-w-[1400px] mx-auto px-6 lg:px-0">
         {/* Tagline — mobile: acima do polaroid | desktop: coluna esquerda */}
         <motion.div
