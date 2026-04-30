@@ -29,6 +29,10 @@ const config: Config = {
       maxWidth: {
         page: "1440px",
       },
+      screens: {
+        "3xl": "1920px",
+        "4xl": "2560px",
+      },
     },
   },
   plugins: [],
