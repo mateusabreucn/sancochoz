@@ -19,6 +19,7 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   const [muted, setMuted] = useState(true);
+  const carouselPaused = !muted;
   const toggleMute = useCallback(() => setMuted(m => !m), []);
 
   const videos = videosByCategory[state.category] ?? [];
@@ -31,15 +32,14 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
 
   useMarquee({
     trackRef,
-    paused: state.isDragging,
+    paused: state.isDragging || carouselPaused,
     pxPerSecond: 80,
     category: state.category,
     itemCount: videos.length,
-    enableDrag: true,
+    enableDrag: !carouselPaused,
     dispatch,
   });
 
-  // Track which video is centered on screen based on marquee track position
   useEffect(() => {
     if (videos.length === 0) {
       setActiveVideoId(null);
