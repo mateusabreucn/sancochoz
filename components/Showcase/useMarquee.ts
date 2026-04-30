@@ -23,7 +23,6 @@ export function useMarquee({
   enableDrag,
   dispatch,
 }: UseMarqueeOptions) {
-  const tweenRef = useRef<gsap.core.Tween | null>(null);
   const singleSetWidthRef = useRef(0);
   const pausedRef = useRef(paused);
   const dispatchRef = useRef(dispatch);
@@ -32,6 +31,8 @@ export function useMarquee({
       ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
       : false
   );
+  const lastTickRef = useRef(0);
+  const tickRef = useRef<((time: number) => void) | null>(null);
 
   useEffect(() => { pausedRef.current = paused; }, [paused]);
   useEffect(() => { dispatchRef.current = dispatch; }, [dispatch]);
@@ -51,36 +52,57 @@ export function useMarquee({
     if (sw === 0) return;
     singleSetWidthRef.current = sw;
 
-    if (tweenRef.current) tweenRef.current.kill();
+    if (tickRef.current) gsap.ticker.remove(tickRef.current);
+
     gsap.set(trackRef.current, { x: 0 });
+    lastTickRef.current = 0;
 
-    tweenRef.current = gsap.to(trackRef.current, {
-      x: -sw,
-      duration: sw / pxPerSecond,
-      ease: "none",
-      repeat: -1,
-    });
+    const tick = (time: number) => {
+      if (!trackRef.current) return;
+      const sw = singleSetWidthRef.current;
+      if (sw === 0) return;
 
-    if (pausedRef.current) tweenRef.current.pause();
+      if (lastTickRef.current === 0) {
+        lastTickRef.current = time;
+        return;
+      }
+
+      const dt = (time - lastTickRef.current) / 1000;
+      lastTickRef.current = time;
+
+      if (dt > 0.5) return;
+
+      const currentX = gsap.getProperty(trackRef.current, "x") as number;
+      let x = currentX - pxPerSecond * dt;
+
+      if (x <= -sw) x += sw;
+
+      gsap.set(trackRef.current, { x });
+    };
+
+    tickRef.current = tick;
+    gsap.ticker.add(tick);
   }, [trackRef, computeWidth, pxPerSecond]);
 
-  // Restart when category changes (new video set, new width)
+  const stopMarquee = useCallback(() => {
+    if (tickRef.current) {
+      gsap.ticker.remove(tickRef.current);
+      tickRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
     const raf = requestAnimationFrame(startMarquee);
     return () => {
       cancelAnimationFrame(raf);
-      tweenRef.current?.kill();
+      stopMarquee();
     };
-  }, [category, startMarquee]);
+  }, [category, startMarquee, stopMarquee]);
 
-  // Pause / resume based on external signal
   useEffect(() => {
-    if (!tweenRef.current) return;
-    if (paused) tweenRef.current.pause();
-    else tweenRef.current.resume();
+    lastTickRef.current = 0;
   }, [paused]);
 
-  // Resize observer: recompute on container resize (ignore sub-pixel changes from scrollbars)
   useEffect(() => {
     const parent = trackRef.current?.parentElement;
     if (!parent) return;
@@ -89,29 +111,26 @@ export function useMarquee({
       const newWidth = parent.offsetWidth;
       if (Math.abs(newWidth - lastWidth) < 4) return;
       lastWidth = newWidth;
-      if (tweenRef.current) tweenRef.current.kill();
-      requestAnimationFrame(startMarquee);
+      singleSetWidthRef.current = computeWidth();
     });
     ro.observe(parent);
     return () => ro.disconnect();
-  }, [trackRef, startMarquee]);
+  }, [trackRef, computeWidth]);
 
-  // Respect prefers-reduced-motion changes at runtime
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const handler = (e: MediaQueryListEvent) => {
       reducedMotionRef.current = e.matches;
       if (e.matches) {
-        tweenRef.current?.kill();
-        tweenRef.current = null;
+        stopMarquee();
       } else {
         requestAnimationFrame(startMarquee);
       }
     };
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
-  }, [startMarquee]);
+  }, [startMarquee, stopMarquee]);
 
   // Drag (mobile only) — direction-lock: vertical scroll passes through
   useEffect(() => {
@@ -169,7 +188,6 @@ export function useMarquee({
         }
 
         e.preventDefault();
-        tweenRef.current?.pause();
         dispatchRef.current?.({ type: "SET_DRAGGING", dragging: true });
       }
 
@@ -203,24 +221,8 @@ export function useMarquee({
         ease: "power3.out",
         onComplete: () => {
           dispatchRef.current?.({ type: "SET_DRAGGING", dragging: false });
-
-          const sw = singleSetWidthRef.current;
-          if (!sw || !trackRef.current) {
-            requestAnimationFrame(startMarquee);
-            return;
-          }
-
-          // Resume marquee from current position instead of snapping to 0
-          const wx = wrap(gsap.getProperty(trackRef.current, "x") as number);
-          if (tweenRef.current) tweenRef.current.kill();
-          gsap.set(trackRef.current, { x: wx });
-          tweenRef.current = gsap.to(trackRef.current, {
-            x: wx - sw,
-            duration: sw / pxPerSecond,
-            ease: "none",
-            repeat: -1,
-          });
-          if (pausedRef.current) tweenRef.current.pause();
+          pausedRef.current = false;
+          lastTickRef.current = 0;
         },
       });
     };
@@ -235,5 +237,5 @@ export function useMarquee({
       document.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerup", onUp);
     };
-  }, [enableDrag, trackRef, startMarquee]);
+  }, [enableDrag, trackRef]);
 }
