@@ -80,11 +80,15 @@ export function useMarquee({
     else tweenRef.current.resume();
   }, [paused]);
 
-  // Resize observer: recompute on container resize
+  // Resize observer: recompute on container resize (ignore sub-pixel changes from scrollbars)
   useEffect(() => {
     const parent = trackRef.current?.parentElement;
     if (!parent) return;
+    let lastWidth = parent.offsetWidth;
     const ro = new ResizeObserver(() => {
+      const newWidth = parent.offsetWidth;
+      if (Math.abs(newWidth - lastWidth) < 4) return;
+      lastWidth = newWidth;
       if (tweenRef.current) tweenRef.current.kill();
       requestAnimationFrame(startMarquee);
     });
