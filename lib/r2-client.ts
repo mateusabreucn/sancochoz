@@ -2,12 +2,16 @@ import "server-only";
 
 import { unstable_cache } from "next/cache";
 import { ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
-import type { Category, ShowcaseVideos, VideoEntry } from "@/components/Showcase/showcase.types";
+import type {
+  Category,
+  ShowcaseVideos,
+  VideoEntry,
+} from "@/components/Showcase/showcase.types";
 
-const categories: Category[] = ["videomaking", "webdesign", "socialmedia"];
+const categories: Category[] = ["videoandphoto", "webdesign", "socialmedia"];
 
 const prefixes: Record<Category, string> = {
-  videomaking: "showcase/videomaking/",
+  videoandphoto: "showcase/videoandphoto/",
   webdesign: "showcase/webdesign/",
   socialmedia: "showcase/socialmedia/",
 };
@@ -79,7 +83,7 @@ async function listVideosByCategory(category: Category): Promise<VideoEntry[]> {
         Bucket: bucket,
         Prefix: prefix,
         ContinuationToken: continuationToken,
-      })
+      }),
     );
 
     for (const object of response.Contents ?? []) {
@@ -100,13 +104,16 @@ async function listVideosByCategory(category: Category): Promise<VideoEntry[]> {
   } while (continuationToken);
 
   return videos.sort((a, b) =>
-    a.id.localeCompare(b.id, undefined, { numeric: true, sensitivity: "base" })
+    a.id.localeCompare(b.id, undefined, { numeric: true, sensitivity: "base" }),
   );
 }
 
 async function listShowcaseVideosUncached(): Promise<ShowcaseVideos> {
   const entries = await Promise.all(
-    categories.map(async (category) => [category, await listVideosByCategory(category)] as const)
+    categories.map(
+      async (category) =>
+        [category, await listVideosByCategory(category)] as const,
+    ),
   );
 
   return Object.fromEntries(entries) as ShowcaseVideos;
@@ -115,5 +122,5 @@ async function listShowcaseVideosUncached(): Promise<ShowcaseVideos> {
 export const listShowcaseVideos = unstable_cache(
   listShowcaseVideosUncached,
   ["showcase-r2-videos"],
-  { revalidate: 60 }
+  { revalidate: 60 },
 );
