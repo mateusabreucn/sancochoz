@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect, useCallback } from "react";
+import gsap from "gsap";
 import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 import { VideoCardMobile } from "./VideoCardMobile";
 import CategoryFilter from "./CategoryFilter";
@@ -16,6 +17,9 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
   const state = useShowcaseState();
   const dispatch = useShowcaseDispatch();
   const trackRef = useRef<HTMLDivElement>(null);
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const [muted, setMuted] = useState(true);
+  const toggleMute = useCallback(() => setMuted(m => !m), []);
 
   const videos = videosByCategory[state.category] ?? [];
 
@@ -35,6 +39,29 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
     dispatch,
   });
 
+  // Track which video is centered on screen based on marquee track position
+  useEffect(() => {
+    if (videos.length === 0) {
+      setActiveVideoId(null);
+      return;
+    }
+
+    const check = () => {
+      const track = trackRef.current;
+      if (!track) return;
+      const x = gsap.getProperty(track, "x") as number;
+      const vw = window.innerWidth;
+      const centeredIdx = Math.round(-x / vw);
+      const wrappedIdx = ((centeredIdx % videos.length) + videos.length) % videos.length;
+      const id = videos[wrappedIdx]?.id ?? null;
+      setActiveVideoId(prev => (prev === id ? prev : id));
+    };
+
+    check();
+    const interval = setInterval(check, 200);
+    return () => clearInterval(interval);
+  }, [videos]);
+
   return (
     <section className="relative w-full overflow-x-clip">
       <div className="relative h-screen select-none overflow-hidden">
@@ -44,6 +71,9 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
               <VideoCardMobile
                 key={`${video.id}-${i}`}
                 entry={video}
+                isActive={activeVideoId === video.id}
+                muted={muted}
+                onToggleMute={toggleMute}
               />
             ))}
           </div>
