@@ -1,13 +1,14 @@
 "use client";
 
-import { useRef, useEffect, useMemo, useState } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 import { VideoCardDesktop } from "./VideoCardDesktop";
 import CategoryFilter from "./CategoryFilter";
+import { ShowcaseCurtain } from "./ShowcaseCurtain";
 import { useMarquee } from "./useMarquee";
 import type { ShowcaseVideos } from "./showcase.types";
 
-const CARD_W = 300;
+const CARD_W = 340;
 
 interface Props {
   videosByCategory: ShowcaseVideos;
@@ -17,12 +18,9 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
   const state = useShowcaseState();
   const dispatch = useShowcaseDispatch();
   const trackRef = useRef<HTMLDivElement>(null);
-  const [trackVisible, setTrackVisible] = useState(true);
-  const firstRender = useRef(true);
 
-  const videos = videosByCategory[state.category];
+  const videos = videosByCategory[state.category] ?? [];
 
-  // Enough copies to always fill the viewport with some overflow
   const copies = useMemo(() => {
     if (videos.length === 0) return 0;
     const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
@@ -37,7 +35,7 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
   useMarquee({
     trackRef,
     paused: state.activeVideoId !== null,
-    pxPerSecond: 30,
+    pxPerSecond: 45,
     category: state.category,
     itemCount: videos.length,
     enableDrag: false,
@@ -55,17 +53,6 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
     };
   }, [dispatch]);
 
-  // Fade out/in on category change
-  useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-    setTrackVisible(false);
-    const id = setTimeout(() => setTrackVisible(true), 150);
-    return () => clearTimeout(id);
-  }, [state.category]);
-
   return (
     <section className="relative w-full overflow-x-clip">
       <div
@@ -73,11 +60,7 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
         onPointerLeave={() => dispatch({ type: "RESET_ACTIVE" })}
       >
         {videos.length > 0 ? (
-          <div
-            ref={trackRef}
-            className="flex h-full absolute left-0 top-0 transition-opacity duration-150 motion-reduce:transition-none"
-            style={{ opacity: trackVisible ? 1 : 0 }}
-          >
+          <div ref={trackRef} className="flex h-full absolute left-0 top-0">
             {displayVideos.map((video, i) => (
               <VideoCardDesktop
                 key={`${video.id}-${i}`}
@@ -96,6 +79,7 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
         )}
 
         <CategoryFilter />
+        <ShowcaseCurtain />
       </div>
     </section>
   );
