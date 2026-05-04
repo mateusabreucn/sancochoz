@@ -3,7 +3,7 @@ import { ShowcaseState, ShowcaseAction } from "./showcase.types";
 export const initialState: ShowcaseState = {
   category: "videoandphoto",
   activeVideoId: null,
-  globalMuted: false,
+  globalMuted: true,
   isDragging: false,
 };
 
@@ -13,11 +13,11 @@ export function showcaseReducer(
 ): ShowcaseState {
   switch (action.type) {
     case "SET_CATEGORY":
-      return { ...state, category: action.category, activeVideoId: null };
+      return { ...state, category: action.category, activeVideoId: null, globalMuted: true };
     case "SET_ACTIVE":
-      return { ...state, activeVideoId: action.id };
+      return { ...state, activeVideoId: action.id, globalMuted: true };
     case "RESET_ACTIVE":
-      return { ...state, activeVideoId: null };
+      return { ...state, activeVideoId: null, globalMuted: true };
     case "TOGGLE_MUTE":
       return { ...state, globalMuted: !state.globalMuted };
     case "SET_DRAGGING":
