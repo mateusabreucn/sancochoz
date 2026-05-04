@@ -17,7 +17,8 @@ export const translations = {
       phone: "phone",
       email: "e-mail",
       messageMobile: "tell me your idea",
-      messageDesktop: "Short or long message, I'm here to understand your project.",
+      messageDesktop:
+        "Short or long message, I'm here to understand your project.",
       send: "send",
       sending: "sending...",
       consent: "by sending, you authorize the use of your contact data",
@@ -38,7 +39,8 @@ export const translations = {
       rights: "All rights reserved.",
     },
     cookie: {
-      message: "We use cookies to analyze site traffic and improve your experience. By continuing, you agree to our",
+      message:
+        "We use cookies to analyze site traffic and improve your experience. By continuing, you agree to our",
       policy: "cookie policy",
       accept: "Accept",
       reject: "Reject",
@@ -54,15 +56,16 @@ export const translations = {
       taglineBefore: "vamos fazer projetos em que ",
       taglineHighlight: "acreditamos",
       taglineAfter: "",
-      cta: "fala comigo",
+      cta: "fale comigo",
     },
     contact: {
-      heading: "fala comigo",
+      heading: "fale comigo",
       name: "nome",
       phone: "telefone",
       email: "e-mail",
       messageMobile: "me conta sua ideia",
-      messageDesktop: "Mensagem curta ou longa, estou aqui para entender o seu projeto.",
+      messageDesktop:
+        "Mensagem curta ou longa, estou aqui para entender o seu projeto.",
       send: "enviar",
       sending: "enviando...",
       consent: "ao enviar, você autoriza o uso dos seus dados de contato",
@@ -83,7 +86,8 @@ export const translations = {
       rights: "Todos os direitos reservados.",
     },
     cookie: {
-      message: "Utilizamos cookies para analisar o tráfego do site e melhorar a sua experiência. Ao continuar, concorda com a nossa",
+      message:
+        "Utilizamos cookies para analisar o tráfego do site e melhorar a sua experiência. Ao continuar, concorda com a nossa",
       policy: "política de cookies",
       accept: "Aceitar",
       reject: "Rejeitar",
