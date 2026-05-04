@@ -77,7 +77,7 @@ body {
 .showcase-curtain {
   position: absolute;
   inset: 0;
-  z-index: 20;
+  z-index: 2500;
   pointer-events: none;
   overflow: hidden;
 }
@@ -104,7 +104,7 @@ body {
 .showcase-mobile-curtain {
   position: absolute;
   inset: 0;
-  z-index: 20;
+  z-index: 2500;
   pointer-events: none;
   overflow: hidden;
 }
