@@ -10,25 +10,28 @@ interface Props {
   entry: VideoEntry;
   cardId: string;
   stackIndex: number;
+  eagerMount?: boolean;
+  onLoaded?: (id: string) => void;
 }
 
 const INACTIVE_W = 340;
 const ACTIVE_W = 400;
 const ACTIVE_H = `${Math.round(ACTIVE_W * (16 / 9))}px`;
 
-export function VideoCardDesktop({ entry, cardId, stackIndex }: Props) {
+export function VideoCardDesktop({ entry, cardId, stackIndex, eagerMount, onLoaded }: Props) {
   const state = useShowcaseState();
   const dispatch = useShowcaseDispatch();
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [hasBeenInView, setHasBeenInView] = useState(false);
+  const [hasBeenInView, setHasBeenInView] = useState(eagerMount ?? false);
   const [videoReady, setVideoReady] = useState(false);
 
   const isActive = state.activeVideoId === cardId;
   const isDimmed = state.activeVideoId !== null && !isActive;
 
-  // Lazy-mount: only load video element once card has been visible
+  // Lazy-mount: only load video element once card has been visible (skipped when eagerMount)
   useEffect(() => {
+    if (eagerMount) return;
     const el = containerRef.current;
     if (!el || hasBeenInView) return;
     const io = new IntersectionObserver(
@@ -37,7 +40,7 @@ export function VideoCardDesktop({ entry, cardId, stackIndex }: Props) {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [hasBeenInView]);
+  }, [hasBeenInView, eagerMount]);
 
   // Three states:
   // - no active card → all cards autoplay muted
@@ -69,6 +72,7 @@ export function VideoCardDesktop({ entry, cardId, stackIndex }: Props) {
 
   const handleVideoLoaded = () => {
     setVideoReady(true);
+    onLoaded?.(entry.id);
     const video = videoRef.current;
     if (!video) return;
     // Start playing as soon as loaded — state determines mute/pause
@@ -81,6 +85,10 @@ export function VideoCardDesktop({ entry, cardId, stackIndex }: Props) {
         video.play().catch(() => {});
       }
     }
+  };
+
+  const handleVideoError = () => {
+    onLoaded?.(entry.id);
   };
 
   return (
@@ -112,6 +120,7 @@ export function VideoCardDesktop({ entry, cardId, stackIndex }: Props) {
           muted
           className={`w-full h-full object-cover transition-opacity duration-300 ${videoReady ? "opacity-100" : "opacity-0"}`}
           onLoadedData={handleVideoLoaded}
+          onError={handleVideoError}
           onClick={() => dispatch({ type: "TOGGLE_MUTE" })}
         />
       )}

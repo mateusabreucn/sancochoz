@@ -7,37 +7,44 @@ import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 
 const MIN_SPIN_MS = 600; // minimum time before curtain is allowed to open
 
-export function ShowcaseCurtain() {
+interface Props {
+  videosReady: boolean;
+  onClosed?: () => void;
+}
+
+export function ShowcaseCurtain({ videosReady, onClosed }: Props) {
   const state = useShowcaseState();
   const dispatch = useShowcaseDispatch();
   const curtainRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
-  const firstRender = useRef(true);
+  const isInitialRef = useRef(true);
   const closeRef = useRef<gsap.core.Tween | null>(null);
   const spinRef = useRef<gsap.core.Tween | null>(null);
   const openRef = useRef<gsap.core.Timeline | null>(null);
+  const videosReadyRef = useRef(videosReady);
+  const tryOpenRef = useRef<() => void>(() => {});
+  const onClosedRef = useRef(onClosed);
+
+  useEffect(() => { onClosedRef.current = onClosed; }, [onClosed]);
 
   useEffect(() => {
-    gsap.set(leftRef.current, { x: "-100%" });
-    gsap.set(rightRef.current, { x: "100%" });
+    videosReadyRef.current = videosReady;
+    if (videosReady) tryOpenRef.current();
+  }, [videosReady]);
+
+  useEffect(() => {
     gsap.set(logoRef.current, { opacity: 0, rotation: 0, xPercent: -50, yPercent: -50 });
   }, []);
 
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-
     const curtain = curtainRef.current;
     const left = leftRef.current;
     const right = rightRef.current;
     const logo = logoRef.current;
     if (!curtain || !left || !right || !logo) return;
 
-    // Kill any running animation from a previous category switch
     closeRef.current?.kill();
     spinRef.current?.kill();
     openRef.current?.kill();
@@ -46,13 +53,15 @@ export function ShowcaseCurtain() {
     curtain.style.pointerEvents = "auto";
     dispatch({ type: "RESET_ACTIVE" });
 
-    let readyToOpen = false;
+    const wasInitial = isInitialRef.current;
+    isInitialRef.current = false;
+
     let aborted = false;
+    let minElapsed = false;
 
     const doOpen = () => {
       if (aborted) return;
       spinRef.current?.kill();
-      // Logo stays at rotation 0 (onRepeat fires when cycle is complete)
       gsap.set(logo, { rotation: 0 });
 
       const tl = gsap.timeline({
@@ -67,32 +76,41 @@ export function ShowcaseCurtain() {
         .to(right, { x: "100%",  duration: 0.55, ease: "power2.inOut" }, 0);
     };
 
-    // Step 1 — close curtains
-    closeRef.current = gsap.to([left, right], {
-      x: "0%",
-      duration: 0.45,
-      ease: "power2.inOut",
-      onComplete: () => {
-        if (aborted) return;
+    const tryOpen = () => {
+      if (aborted) return;
+      if (minElapsed && videosReadyRef.current) doOpen();
+    };
+    tryOpenRef.current = tryOpen;
 
-        // Step 2 — show logo
-        gsap.to(logo, { opacity: 1, duration: 0.2, ease: "power2.out" });
+    const startSpin = () => {
+      if (aborted) return;
+      gsap.to(logo, { opacity: 1, duration: 0.2, ease: "power2.out" });
+      spinRef.current = gsap.to(logo, {
+        rotation: "+=360",
+        duration: 0.75,
+        ease: "none",
+        repeat: -1,
+        onRepeat: tryOpen,
+      });
+      setTimeout(() => { minElapsed = true; tryOpen(); }, MIN_SPIN_MS);
+    };
 
-        // Step 3 — spin; open only when a full cycle completes AND min time has passed
-        spinRef.current = gsap.to(logo, {
-          rotation: "+=360",
-          duration: 0.75,
-          ease: "none",
-          repeat: -1,
-          onRepeat: () => {
-            if (readyToOpen) doOpen();
-          },
-        });
-
-        // Allow opening after minimum time (aligned to next spin cycle via onRepeat)
-        setTimeout(() => { readyToOpen = true; }, MIN_SPIN_MS);
-      },
-    });
+    if (wasInitial) {
+      gsap.set([left, right], { x: "0%" });
+      startSpin();
+    } else {
+      gsap.set(logo, { opacity: 0, rotation: 0 });
+      closeRef.current = gsap.to([left, right], {
+        x: "0%",
+        duration: 0.45,
+        ease: "power2.inOut",
+        onComplete: () => {
+          if (aborted) return;
+          onClosedRef.current?.();
+          startSpin();
+        },
+      });
+    }
 
     return () => {
       aborted = true;
@@ -107,7 +125,7 @@ export function ShowcaseCurtain() {
     <div ref={curtainRef} className="showcase-curtain">
       <div ref={leftRef} className="curtain-panel curtain-left" />
       <div ref={rightRef} className="curtain-panel curtain-right">
-        <div ref={logoRef} className="curtain-logo">
+        <div ref={logoRef} className="curtain-logo" style={{ opacity: 0 }}>
           <Image src="/LogoImage.svg" alt="" width={72} height={72} priority />
         </div>
       </div>

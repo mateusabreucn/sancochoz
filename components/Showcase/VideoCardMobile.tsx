@@ -9,11 +9,21 @@ interface Props {
   isActive: boolean;
   muted: boolean;
   onToggleMute: () => void;
+  onLoaded?: (id: string) => void;
 }
 
-export function VideoCardMobile({ entry, isActive, muted, onToggleMute }: Props) {
+export function VideoCardMobile({ entry, isActive, muted, onToggleMute, onLoaded }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
+
+  const handleLoaded = () => {
+    setVideoReady(true);
+    onLoaded?.(entry.id);
+  };
+
+  const handleError = () => {
+    onLoaded?.(entry.id);
+  };
 
   useEffect(() => {
     const video = videoRef.current;
@@ -45,7 +55,8 @@ export function VideoCardMobile({ entry, isActive, muted, onToggleMute }: Props)
         playsInline
         muted
         className={`w-full h-full object-cover transition-opacity duration-300 ${videoReady ? "opacity-100" : "opacity-0"}`}
-        onLoadedData={() => setVideoReady(true)}
+        onLoadedData={handleLoaded}
+        onError={handleError}
       />
 
       <div
