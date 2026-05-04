@@ -127,7 +127,7 @@ export function VideoCardDesktop({ entry, cardId, stackIndex, eagerMount, onLoad
 
       {isActive && (
         <button
-          className="absolute bottom-3 right-3 w-12 h-12 rounded-full bg-white/70 flex items-center justify-center z-10 text-black"
+          className="absolute bottom-3 right-3 w-12 h-12 rounded-full bg-white/70 flex items-center justify-center z-[2100] text-black"
           onClick={(e) => {
             e.stopPropagation();
             dispatch({ type: "TOGGLE_MUTE" });

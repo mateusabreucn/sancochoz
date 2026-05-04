@@ -61,7 +61,7 @@ export function VideoCardMobile({ entry, isActive, muted, onToggleMute, onLoaded
 
       <div
         onClick={(e) => { e.stopPropagation(); onToggleMute(); }}
-        className="absolute bottom-3 right-3 w-12 h-12 rounded-full bg-white/70 flex items-center justify-center z-10 text-black cursor-pointer"
+        className="absolute bottom-3 right-3 w-12 h-12 rounded-full bg-white/70 flex items-center justify-center z-[2100] text-black cursor-pointer"
       >
         <MuteIcon muted={muted} />
       </div>
