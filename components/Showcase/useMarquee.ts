@@ -32,9 +32,61 @@ export function useMarquee({
       : false
   );
   const tickRef = useRef<((time: number, deltaTime: number) => void) | null>(null);
+  const tweeningRef = useRef(false);
+  const tweenRef = useRef<gsap.core.Tween | null>(null);
 
   useEffect(() => { pausedRef.current = paused; }, [paused]);
   useEffect(() => { dispatchRef.current = dispatch; }, [dispatch]);
+
+  const wrapX = useCallback((x: number) => {
+    const sw = singleSetWidthRef.current;
+    if (!sw) return x;
+    let wrapped = x % sw;
+    if (wrapped > 0) wrapped -= sw;
+    return wrapped;
+  }, []);
+
+  const tweenTo = useCallback((target: number, duration: number) => {
+    if (!trackRef.current) return;
+    if (tweenRef.current) tweenRef.current.kill();
+    tweeningRef.current = true;
+    tweenRef.current = gsap.to(trackRef.current, {
+      x: target,
+      duration,
+      ease: "power2.out",
+      onComplete: () => {
+        if (trackRef.current) {
+          gsap.set(trackRef.current, { x: wrapX(target) });
+        }
+        tweeningRef.current = false;
+        tweenRef.current = null;
+      },
+    });
+  }, [trackRef, wrapX]);
+
+  const scrollBy = useCallback((offset: number, duration = 0.55) => {
+    if (!trackRef.current) return;
+    const currentX = gsap.getProperty(trackRef.current, "x") as number;
+    tweenTo(currentX + offset, duration);
+  }, [trackRef, tweenTo]);
+
+  const snapToNearest = useCallback((unitPx: number, duration = 0.35) => {
+    if (!trackRef.current || unitPx <= 0) return;
+    const currentX = gsap.getProperty(trackRef.current, "x") as number;
+    const target = Math.round(currentX / unitPx) * unitPx;
+    tweenTo(target, duration);
+  }, [trackRef, tweenTo]);
+
+  const nudgeBy = useCallback((offset: number) => {
+    if (!trackRef.current) return;
+    if (tweenRef.current) {
+      tweenRef.current.kill();
+      tweenRef.current = null;
+    }
+    tweeningRef.current = false;
+    const currentX = gsap.getProperty(trackRef.current, "x") as number;
+    gsap.set(trackRef.current, { x: wrapX(currentX + offset) });
+  }, [trackRef, wrapX]);
 
   const computeWidth = useCallback(() => {
     if (!trackRef.current) return 0;
@@ -52,12 +104,17 @@ export function useMarquee({
     singleSetWidthRef.current = sw;
 
     if (tickRef.current) gsap.ticker.remove(tickRef.current);
+    if (tweenRef.current) {
+      tweenRef.current.kill();
+      tweenRef.current = null;
+    }
+    tweeningRef.current = false;
 
     gsap.set(trackRef.current, { x: 0 });
 
     const tick = (_time: number, deltaTime: number) => {
       if (!trackRef.current) return;
-      if (pausedRef.current) return;
+      if (pausedRef.current || tweeningRef.current) return;
       const sw = singleSetWidthRef.current;
       if (sw === 0) return;
 
@@ -81,6 +138,11 @@ export function useMarquee({
       gsap.ticker.remove(tickRef.current);
       tickRef.current = null;
     }
+    if (tweenRef.current) {
+      tweenRef.current.kill();
+      tweenRef.current = null;
+    }
+    tweeningRef.current = false;
   }, []);
 
   useEffect(() => {
@@ -119,6 +181,19 @@ export function useMarquee({
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, [startMarquee, stopMarquee]);
+
+  // Horizontal wheel scroll → nudge carousel
+  useEffect(() => {
+    const parent = trackRef.current?.parentElement;
+    if (!parent) return;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      nudgeBy(-e.deltaX);
+    };
+    parent.addEventListener("wheel", onWheel, { passive: false });
+    return () => parent.removeEventListener("wheel", onWheel);
+  }, [trackRef, nudgeBy]);
 
   // Drag (mobile only) — direction-lock: vertical scroll passes through
   useEffect(() => {
@@ -225,4 +300,6 @@ export function useMarquee({
       document.removeEventListener("pointerup", onUp);
     };
   }, [enableDrag, trackRef]);
+
+  return { scrollBy, snapToNearest };
 }
