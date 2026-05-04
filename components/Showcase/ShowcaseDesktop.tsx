@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useState, useCallback } from "react";
 import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 import { VideoCardDesktop } from "./VideoCardDesktop";
 import CategoryFilter from "./CategoryFilter";
 import { ShowcaseCurtain } from "./ShowcaseCurtain";
+import { ArrowButton } from "./ArrowButton";
 import { useMarquee } from "./useMarquee";
 import type { ShowcaseVideos } from "./showcase.types";
 
@@ -19,7 +20,12 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
   const dispatch = useShowcaseDispatch();
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const videos = videosByCategory[state.category] ?? [];
+  const [displayCategory, setDisplayCategory] = useState(state.category);
+  const commitCategory = useCallback(() => {
+    setDisplayCategory(state.category);
+  }, [state.category]);
+
+  const videos = videosByCategory[displayCategory] ?? [];
 
   const copies = useMemo(() => {
     if (videos.length === 0) return 0;
@@ -32,11 +38,18 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
     [videos, copies]
   );
 
-  useMarquee({
+  const [loadedIds, setLoadedIds] = useState<Set<string>>(() => new Set());
+  const handleVideoLoaded = useCallback((id: string) => {
+    setLoadedIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
+  }, []);
+  useEffect(() => { setLoadedIds(new Set()); }, [displayCategory]);
+  const videosReady = videos.length === 0 || videos.every((v) => loadedIds.has(v.id));
+
+  const { scrollBy } = useMarquee({
     trackRef,
     paused: state.activeVideoId !== null,
     pxPerSecond: 45,
-    category: state.category,
+    category: displayCategory,
     itemCount: videos.length,
     enableDrag: false,
   });
@@ -67,6 +80,8 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
                 entry={video}
                 cardId={`${video.id}-${i}`}
                 stackIndex={i}
+                eagerMount={i < videos.length}
+                onLoaded={handleVideoLoaded}
               />
             ))}
           </div>
@@ -78,8 +93,23 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
           </div>
         )}
 
+        {videos.length > 0 && (
+          <>
+            <ArrowButton
+              direction="left"
+              onClick={() => scrollBy(CARD_W)}
+              onMouseEnter={() => dispatch({ type: "RESET_ACTIVE" })}
+            />
+            <ArrowButton
+              direction="right"
+              onClick={() => scrollBy(-CARD_W)}
+              onMouseEnter={() => dispatch({ type: "RESET_ACTIVE" })}
+            />
+          </>
+        )}
+
         <CategoryFilter />
-        <ShowcaseCurtain />
+        <ShowcaseCurtain videosReady={videosReady} onClosed={commitCategory} />
       </div>
     </section>
   );

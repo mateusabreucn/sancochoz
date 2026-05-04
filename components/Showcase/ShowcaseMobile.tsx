@@ -6,6 +6,7 @@ import { useShowcaseState, useShowcaseDispatch } from "./ShowcaseContext";
 import { VideoCardMobile } from "./VideoCardMobile";
 import CategoryFilter from "./CategoryFilter";
 import { ShowcaseMobileCurtain } from "./ShowcaseMobileCurtain";
+import { ArrowButton } from "./ArrowButton";
 import { useMarquee } from "./useMarquee";
 import type { ShowcaseVideos } from "./showcase.types";
 
@@ -22,7 +23,12 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
   const carouselPaused = !muted;
   const toggleMute = useCallback(() => setMuted(m => !m), []);
 
-  const videos = videosByCategory[state.category] ?? [];
+  const [displayCategory, setDisplayCategory] = useState(state.category);
+  const commitCategory = useCallback(() => {
+    setDisplayCategory(state.category);
+  }, [state.category]);
+
+  const videos = videosByCategory[displayCategory] ?? [];
 
   const copies = videos.length === 0 ? 0 : Math.max(2, videos.length < 3 ? 4 : 2);
   const displayVideos = useMemo(
@@ -30,15 +36,29 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
     [videos, copies]
   );
 
-  useMarquee({
+  const [loadedIds, setLoadedIds] = useState<Set<string>>(() => new Set());
+  const handleVideoLoaded = useCallback((id: string) => {
+    setLoadedIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
+  }, []);
+  useEffect(() => { setLoadedIds(new Set()); }, [displayCategory]);
+  const videosReady = videos.length === 0 || videos.every((v) => loadedIds.has(v.id));
+
+  const { scrollBy, snapToNearest } = useMarquee({
     trackRef,
     paused: state.isDragging || carouselPaused,
     pxPerSecond: 80,
-    category: state.category,
+    category: displayCategory,
     itemCount: videos.length,
     enableDrag: !carouselPaused,
     dispatch,
   });
+
+  // Snap-center the active video whenever the carousel pauses (user tapped to unmute)
+  useEffect(() => {
+    if (!carouselPaused) return;
+    if (typeof window === "undefined") return;
+    snapToNearest(window.innerWidth);
+  }, [carouselPaused, snapToNearest]);
 
   useEffect(() => {
     if (videos.length === 0) {
@@ -74,6 +94,7 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
                 isActive={activeVideoId === video.id}
                 muted={muted}
                 onToggleMute={toggleMute}
+                onLoaded={handleVideoLoaded}
               />
             ))}
           </div>
@@ -85,8 +106,21 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
           </div>
         )}
 
+        {videos.length > 0 && carouselPaused && (
+          <>
+            <ArrowButton
+              direction="left"
+              onClick={() => scrollBy(window.innerWidth)}
+            />
+            <ArrowButton
+              direction="right"
+              onClick={() => scrollBy(-window.innerWidth)}
+            />
+          </>
+        )}
+
         <CategoryFilter />
-        <ShowcaseMobileCurtain />
+        <ShowcaseMobileCurtain videosReady={videosReady} onClosed={commitCategory} />
       </div>
     </section>
   );

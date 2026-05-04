@@ -25,6 +25,7 @@ export default function CategoryFilter() {
           <button
             key={key}
             onClick={() => dispatch({ type: "SET_CATEGORY", category: key })}
+            onMouseEnter={() => dispatch({ type: "RESET_ACTIVE" })}
             className={`
               relative overflow-hidden pointer-events-auto font-body
               text-[clamp(1rem,2.5vw,2rem)] font-black tracking-[0.08em] lowercase
