@@ -118,7 +118,7 @@ export function VideoCardDesktop({ entry, cardId, stackIndex }: Props) {
 
       {isActive && (
         <button
-          className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center z-10 text-black"
+          className="absolute bottom-3 right-3 w-12 h-12 rounded-full bg-white/70 flex items-center justify-center z-10 text-black"
           onClick={(e) => {
             e.stopPropagation();
             dispatch({ type: "TOGGLE_MUTE" });
@@ -127,7 +127,6 @@ export function VideoCardDesktop({ entry, cardId, stackIndex }: Props) {
           <MuteIcon muted={state.globalMuted} />
         </button>
       )}
-
     </div>
   );
 }
