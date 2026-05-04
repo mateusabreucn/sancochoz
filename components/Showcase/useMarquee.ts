@@ -31,8 +31,7 @@ export function useMarquee({
       ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
       : false
   );
-  const lastTickRef = useRef(0);
-  const tickRef = useRef<((time: number) => void) | null>(null);
+  const tickRef = useRef<((time: number, deltaTime: number) => void) | null>(null);
 
   useEffect(() => { pausedRef.current = paused; }, [paused]);
   useEffect(() => { dispatchRef.current = dispatch; }, [dispatch]);
@@ -55,21 +54,14 @@ export function useMarquee({
     if (tickRef.current) gsap.ticker.remove(tickRef.current);
 
     gsap.set(trackRef.current, { x: 0 });
-    lastTickRef.current = 0;
 
-    const tick = (time: number) => {
+    const tick = (_time: number, deltaTime: number) => {
       if (!trackRef.current) return;
+      if (pausedRef.current) return;
       const sw = singleSetWidthRef.current;
       if (sw === 0) return;
 
-      if (lastTickRef.current === 0) {
-        lastTickRef.current = time;
-        return;
-      }
-
-      const dt = (time - lastTickRef.current) / 1000;
-      lastTickRef.current = time;
-
+      const dt = deltaTime / 1000;
       if (dt > 0.5) return;
 
       const currentX = gsap.getProperty(trackRef.current, "x") as number;
@@ -98,10 +90,6 @@ export function useMarquee({
       stopMarquee();
     };
   }, [category, startMarquee, stopMarquee]);
-
-  useEffect(() => {
-    lastTickRef.current = 0;
-  }, [paused]);
 
   useEffect(() => {
     const parent = trackRef.current?.parentElement;
@@ -222,7 +210,6 @@ export function useMarquee({
         onComplete: () => {
           dispatchRef.current?.({ type: "SET_DRAGGING", dragging: false });
           pausedRef.current = false;
-          lastTickRef.current = 0;
         },
       });
     };
