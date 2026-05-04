@@ -25,7 +25,7 @@ export function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 mx-auto z-[150] max-w-[280px] sm:max-w-xs sm:bottom-6 sm:left-6 sm:right-auto sm:mx-0">
+    <div className="fixed bottom-4 left-4 right-4 mx-auto z-[5000] max-w-[280px] sm:max-w-xs sm:bottom-6 sm:left-6 sm:right-auto sm:mx-0">
       {/* Tape */}
       <div className="absolute -top-4 -left-4 z-10 rotate-[-20deg] w-14 h-7 sm:w-16 sm:h-8">
         <Image
