@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform, type MotionValue } from "framer-motion
 import Image from "next/image";
 import Link from "next/link";
 import { useLang } from "@/context/LanguageContext";
+import { usePageLoader } from "@/context/PageLoaderContext";
 import type { Lang } from "@/lib/i18n/translations";
 
 const LogoBg = () => (
@@ -19,9 +20,9 @@ interface HeaderProps {
   variant?: "default" | "about";
 }
 
-const fade = (delay = 0) => ({
+const fade = (delay = 0, show = true) => ({
   initial: { opacity: 0 },
-  animate: { opacity: 1 },
+  animate: { opacity: show ? 1 : 0 },
   transition: { duration: 0.6, delay },
 });
 
@@ -68,6 +69,7 @@ const LogoTitle = ({ size = "desktop" }: { size?: "mobile" | "desktop" }) => (
 export default function Header({ variant = "default" }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { t } = useLang();
+  const { loaderDone } = usePageLoader();
   const { scrollY } = useScroll();
   const titleRef = useRef<HTMLDivElement>(null);
   const [titleTranslate, setTitleTranslate] = useState(0);
@@ -99,7 +101,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
       <header className="sticky top-0 z-[200] h-14 lg:h-20 bg-white shadow-lg">
         {/* ── Mobile layout ── */}
         <div className="lg:hidden h-full flex items-center px-4 relative">
-          <motion.div {...fade(0)}>
+          <motion.div {...fade(0, loaderDone)}>
             <Link href="/">
               <Image
                 src="/LogoImage.svg"
@@ -113,7 +115,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
           </motion.div>
 
           <motion.div
-            {...fade(0.1)}
+            {...fade(0.1, loaderDone)}
             className="absolute left-1/2 -translate-x-1/2"
           >
             <div className="relative px-3 py-1.5">
@@ -128,7 +130,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
             </div>
           </motion.div>
 
-          <motion.div {...fade(0.3)} className="ml-auto flex items-center gap-3">
+          <motion.div {...fade(0.3, loaderDone)} className="ml-auto flex items-center gap-3">
             {variant === "about" ? (
               <Link href="/" className={navLinkClass}>
                 {t.nav.home}
@@ -149,7 +151,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
         {/* ── Desktop layout ── */}
         <div className="hidden lg:flex h-full items-center px-12 relative">
           {/* Logo icon — always left */}
-          <motion.div {...fade(0)}>
+          <motion.div {...fade(0, loaderDone)}>
             <Link href="/">
               <Image
                 src="/LogoImage.svg"
@@ -168,7 +170,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
               ref={titleRef}
               className="ml-1.5"
               style={{ x: titleX }}
-              {...fade(0.1)}
+              {...fade(0.1, loaderDone)}
             >
               <div className="relative px-2 py-1.5 mb-1.5">
                 <LogoBgMotion opacity={highlightOpacity} />
@@ -180,7 +182,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
           {/* Logo title — about page: always centered */}
           {variant === "about" && (
             <motion.div
-              {...fade(0.1)}
+              {...fade(0.1, loaderDone)}
               className="absolute left-1/2 -translate-x-1/2"
             >
               <Link href="/">
@@ -194,7 +196,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
 
           {/* Nav — always right */}
           <motion.nav
-            {...fade(0.3)}
+            {...fade(0.3, loaderDone)}
             className="ml-auto flex items-center gap-6"
           >
             <LangToggle />

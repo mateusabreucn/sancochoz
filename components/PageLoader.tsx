@@ -3,11 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
+import { usePageLoader } from "@/context/PageLoaderContext";
 
 const MIN_MS = 1800;
 
 export function PageLoader() {
   const [gone, setGone] = useState(false);
+  const { markLoaderDone } = usePageLoader();
   const overlayRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
@@ -41,6 +43,9 @@ export function PageLoader() {
 
       setTimeout(() => {
         const isMobile = window.innerWidth < 1024;
+
+        // Curtain is about to open — release the page entrance animations
+        markLoaderDone();
 
         gsap.to(barTrackRef.current, { opacity: 0, duration: 0.25, ease: "power2.in" });
 
@@ -101,7 +106,7 @@ export function PageLoader() {
       window.removeEventListener("load", dismiss);
       document.body.style.overflow = "";
     };
-  }, []);
+  }, [markLoaderDone]);
 
   if (gone) return null;
 

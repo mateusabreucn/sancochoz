@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import PolaroidDeck from "./PolaroidDeck";
 import { useLang } from "@/context/LanguageContext";
+import { usePageLoader } from "@/context/PageLoaderContext";
 
 function usePolaroidScale() {
   const [scale, setScale] = useState(0.75);
@@ -22,6 +23,7 @@ function usePolaroidScale() {
 export default function Hero() {
   const polaroidScale = usePolaroidScale();
   const { t } = useLang();
+  const { loaderDone } = usePageLoader();
 
   return (
     <section className="mb-36 my-28 lg:my-44">
@@ -29,7 +31,7 @@ export default function Hero() {
         {/* Tagline — mobile: acima do polaroid | desktop: coluna esquerda */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
+          animate={loaderDone ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
           transition={{ duration: 0.6, delay: 0.15 }}
           className="flex justify-center lg:justify-end lg:pr-8 text-center lg:text-right order-1"
         >
@@ -46,7 +48,7 @@ export default function Hero() {
         {/* Polaroid Deck — coluna central */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={loaderDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
           transition={{ duration: 0.65, ease: "easeOut" }}
           className="flex justify-center items-start order-2"
         >
@@ -77,7 +79,7 @@ export default function Hero() {
         {/* Botão CTA — mobile: abaixo do polaroid | desktop: coluna direita */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
+          animate={loaderDone ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex justify-center lg:justify-start lg:pl-8 order-3"
         >

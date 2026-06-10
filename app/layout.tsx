@@ -4,6 +4,7 @@ import { PageLoader } from "@/components/PageLoader";
 import { CookieConsent } from "@/components/CookieConsent";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { PageLoaderProvider } from "@/context/PageLoaderContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,12 +39,14 @@ export default function RootLayout({
         className={`${inter.variable} ${permanentMarker.variable} font-body bg-bg`}
       >
         <LanguageProvider>
-          <ScrollToTop />
-          <PageLoader />
-          <CookieConsent />
-          <div className="max-w-screen-3xl mx-auto">
-            {children}
-          </div>
+          <PageLoaderProvider>
+            <ScrollToTop />
+            <PageLoader />
+            <CookieConsent />
+            <div className="max-w-screen-3xl mx-auto">
+              {children}
+            </div>
+          </PageLoaderProvider>
         </LanguageProvider>
       </body>
     </html>
