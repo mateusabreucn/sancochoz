@@ -43,7 +43,7 @@ export const translations = {
         "We use cookies to analyze site traffic and improve your experience. By continuing, you agree to our",
       policy: "cookie policy",
       accept: "Accept",
-      reject: "Reject",
+      reject: "Decline",
     },
   },
   pt: {
