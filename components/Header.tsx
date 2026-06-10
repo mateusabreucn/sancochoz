@@ -74,14 +74,21 @@ export default function Header({ variant = "default" }: HeaderProps) {
 
   useEffect(() => {
     const compute = () => {
-      if (!titleRef.current) return;
-      const rect = titleRef.current.getBoundingClientRect();
-      const naturalCenter = rect.left + rect.width / 2;
+      const el = titleRef.current;
+      const parent = el?.offsetParent as HTMLElement | null;
+      if (!el || !parent) return;
+      // offsetLeft ignores the motion transform, so this measures the title's
+      // resting position even when the page loads already scrolled
+      const naturalCenter =
+        parent.getBoundingClientRect().left + el.offsetLeft + el.offsetWidth / 2;
       setTitleTranslate(window.innerWidth / 2 - naturalCenter);
     };
-    setTimeout(compute, 50);
+    const timer = setTimeout(compute, 50);
     window.addEventListener("resize", compute);
-    return () => window.removeEventListener("resize", compute);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", compute);
+    };
   }, []);
 
   const titleX = useTransform(scrollY, [0, 300], [0, titleTranslate]);
@@ -149,7 +156,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
                 alt="sancochoz"
                 width={40}
                 height={40}
-                className="w-16 h-16"
+                className="w-14 h-14"
                 priority
               />
             </Link>
@@ -163,7 +170,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
               style={{ x: titleX }}
               {...fade(0.1)}
             >
-              <div className="relative px-3 py-2 mb-1.5">
+              <div className="relative px-2 py-1.5 mb-1.5">
                 <LogoBgMotion opacity={highlightOpacity} />
                 <LogoTitle size="desktop" />
               </div>
