@@ -50,6 +50,14 @@ export function useMarquee({
     if (!trackRef.current) return;
     if (tweenRef.current) tweenRef.current.kill();
     tweeningRef.current = true;
+    // There is no content right of x=0 — shift back a full set first so a
+    // rightward tween never exposes the blank edge
+    const sw = singleSetWidthRef.current;
+    if (sw > 0 && target > 0) {
+      const currentX = gsap.getProperty(trackRef.current, "x") as number;
+      gsap.set(trackRef.current, { x: currentX - sw });
+      target -= sw;
+    }
     tweenRef.current = gsap.to(trackRef.current, {
       x: target,
       duration,
@@ -275,14 +283,35 @@ export function useMarquee({
       }
 
       dragging = false;
-      const momentum = velocityPx * 16 * 20;
-      const target = wrap(getX() + momentum);
+      const sw = singleSetWidthRef.current;
+      let momentum = velocityPx * 16 * 20;
+      // Cap the fling so the tween never travels past the duplicated copies
+      if (sw > 0) {
+        const maxFling = Math.max(0, sw - window.innerWidth);
+        momentum = Math.max(-maxFling, Math.min(maxFling, momentum));
+      }
+
+      // Tween to the raw target through the duplicate copies and wrap only
+      // after settling — wrapping the target first would visibly animate the
+      // whole track back to the start
+      let x = getX();
+      let target = x + momentum;
+      if (sw > 0) {
+        while (target > 0) {
+          x -= sw;
+          target -= sw;
+        }
+        gsap.set(trackRef.current, { x });
+      }
       const duration = Math.min(1.6, Math.max(0.4, Math.abs(velocityPx) * 0.8));
       gsap.to(trackRef.current, {
         x: target,
         duration,
         ease: "power3.out",
         onComplete: () => {
+          if (trackRef.current) {
+            gsap.set(trackRef.current, { x: wrap(target) });
+          }
           dispatchRef.current?.({ type: "SET_DRAGGING", dragging: false });
           pausedRef.current = false;
         },
