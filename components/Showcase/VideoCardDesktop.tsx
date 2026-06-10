@@ -29,14 +29,15 @@ export function VideoCardDesktop({ entry, cardId, stackIndex, eagerMount, onLoad
   const isActive = state.activeVideoId === cardId;
   const isDimmed = state.activeVideoId !== null && !isActive;
 
-  // Lazy-mount: only load video element once card has been visible (skipped when eagerMount)
+  // Lazy-mount: load the video element before the card scrolls into view
+  // (rootMargin pre-mounts it ~2 cards ahead so it never appears blank)
   useEffect(() => {
     if (eagerMount) return;
     const el = containerRef.current;
     if (!el || hasBeenInView) return;
     const io = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) setHasBeenInView(true); },
-      { threshold: 0.01 }
+      { rootMargin: "0px 700px 0px 700px", threshold: 0 }
     );
     io.observe(el);
     return () => io.disconnect();

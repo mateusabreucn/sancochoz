@@ -10,6 +10,9 @@ import { useMarquee } from "./useMarquee";
 import type { ShowcaseVideos } from "./showcase.types";
 
 const CARD_W = 340;
+// Curtain opens when the initially visible videos are ready, or after this
+// cap — remaining videos keep loading behind their skeletons
+const READY_TIMEOUT_MS = 8000;
 
 interface Props {
   videosByCategory: ShowcaseVideos;
@@ -38,12 +41,30 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
     [videos, copies]
   );
 
+  // Only the cards that fit the first screen load upfront — the rest
+  // lazy-load as they approach the viewport
+  const eagerCount = useMemo(() => {
+    const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
+    return Math.min(videos.length, Math.ceil(vw / CARD_W) + 1);
+  }, [videos.length]);
+
   const [loadedIds, setLoadedIds] = useState<Set<string>>(() => new Set());
   const handleVideoLoaded = useCallback((id: string) => {
     setLoadedIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
   }, []);
   useEffect(() => { setLoadedIds(new Set()); }, [displayCategory]);
-  const videosReady = videos.length === 0 || videos.every((v) => loadedIds.has(v.id));
+
+  const [readyTimedOut, setReadyTimedOut] = useState(false);
+  useEffect(() => {
+    setReadyTimedOut(false);
+    const timer = setTimeout(() => setReadyTimedOut(true), READY_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [displayCategory]);
+
+  const videosReady =
+    videos.length === 0 ||
+    readyTimedOut ||
+    videos.slice(0, eagerCount).every((v) => loadedIds.has(v.id));
 
   const { scrollBy } = useMarquee({
     trackRef,
@@ -80,7 +101,7 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
                 entry={video}
                 cardId={`${video.id}-${i}`}
                 stackIndex={i}
-                eagerMount={i < videos.length}
+                eagerMount={i < eagerCount}
                 onLoaded={handleVideoLoaded}
               />
             ))}

@@ -10,6 +10,10 @@ import { ArrowButton } from "./ArrowButton";
 import { useMarquee } from "./useMarquee";
 import type { ShowcaseVideos } from "./showcase.types";
 
+// Curtain opens when the first videos are ready, or after this cap —
+// remaining videos keep loading behind their skeletons
+const READY_TIMEOUT_MS = 8000;
+
 interface Props {
   videosByCategory: ShowcaseVideos;
 }
@@ -36,12 +40,27 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
     [videos, copies]
   );
 
+  // Only the on-screen video and the next one load upfront — the rest
+  // lazy-load as they approach the viewport
+  const eagerCount = Math.min(videos.length, 2);
+
   const [loadedIds, setLoadedIds] = useState<Set<string>>(() => new Set());
   const handleVideoLoaded = useCallback((id: string) => {
     setLoadedIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
   }, []);
   useEffect(() => { setLoadedIds(new Set()); }, [displayCategory]);
-  const videosReady = videos.length === 0 || videos.every((v) => loadedIds.has(v.id));
+
+  const [readyTimedOut, setReadyTimedOut] = useState(false);
+  useEffect(() => {
+    setReadyTimedOut(false);
+    const timer = setTimeout(() => setReadyTimedOut(true), READY_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [displayCategory]);
+
+  const videosReady =
+    videos.length === 0 ||
+    readyTimedOut ||
+    videos.slice(0, eagerCount).every((v) => loadedIds.has(v.id));
 
   const { scrollBy, snapToNearest } = useMarquee({
     trackRef,
@@ -93,6 +112,7 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
                 entry={video}
                 isActive={activeVideoId === video.id}
                 muted={muted}
+                eagerMount={i < eagerCount}
                 onToggleMute={toggleMute}
                 onLoaded={handleVideoLoaded}
               />
