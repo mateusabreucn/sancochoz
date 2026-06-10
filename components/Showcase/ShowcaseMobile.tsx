@@ -83,7 +83,7 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
   }, [videos]);
 
   return (
-    <section className="relative w-full overflow-x-clip">
+    <section className="relative z-10 isolate w-full overflow-x-clip">
       <div className="relative h-screen select-none overflow-hidden">
         {videos.length > 0 ? (
           <div ref={trackRef} className="flex h-full absolute left-0 top-0">

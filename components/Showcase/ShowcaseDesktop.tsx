@@ -67,7 +67,7 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
   }, [dispatch]);
 
   return (
-    <section className="relative w-full overflow-x-clip">
+    <section className="relative z-10 isolate w-full overflow-x-clip">
       <div
         className="relative h-[600px] select-none"
         onPointerLeave={() => dispatch({ type: "RESET_ACTIVE" })}
