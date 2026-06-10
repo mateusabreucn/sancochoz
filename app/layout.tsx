@@ -2,6 +2,7 @@ import { Inter, Permanent_Marker } from "next/font/google";
 import "@/styles/globals.css";
 import { PageLoader } from "@/components/PageLoader";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { LanguageProvider } from "@/context/LanguageContext";
 
 const inter = Inter({
@@ -37,6 +38,7 @@ export default function RootLayout({
         className={`${inter.variable} ${permanentMarker.variable} font-body bg-bg`}
       >
         <LanguageProvider>
+          <ScrollToTop />
           <PageLoader />
           <CookieConsent />
           <div className="max-w-screen-3xl mx-auto">
