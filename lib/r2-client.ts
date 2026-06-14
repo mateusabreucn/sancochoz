@@ -32,8 +32,10 @@ function publicBaseUrl(): string {
   ).replace(/\/$/, "");
 }
 
-function createClient() {
-  return new S3Client({
+let client: S3Client | undefined;
+
+function getClient(): S3Client {
+  client ??= new S3Client({
     region: "auto",
     endpoint: requiredEnv("R2_ENDPOINT"),
     credentials: {
@@ -41,6 +43,7 @@ function createClient() {
       secretAccessKey: requiredEnv("R2_SECRET_ACCESS_KEY"),
     },
   });
+  return client;
 }
 
 function keyToId(category: Category, key: string): string {
@@ -71,7 +74,7 @@ function keyToPublicUrl(key: string): string {
 }
 
 async function listVideosByCategory(category: Category): Promise<VideoEntry[]> {
-  const client = createClient();
+  const client = getClient();
   const bucket = requiredEnv("R2_BUCKET");
   const prefix = prefixes[category];
   const videos: VideoEntry[] = [];

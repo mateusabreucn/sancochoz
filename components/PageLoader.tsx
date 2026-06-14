@@ -37,11 +37,13 @@ export function PageLoader() {
       );
     });
 
+    let dismissTimer: ReturnType<typeof setTimeout> | undefined;
+
     const dismiss = () => {
       const elapsed = Date.now() - startRef.current;
       const wait = Math.max(0, MIN_MS - elapsed);
 
-      setTimeout(() => {
+      dismissTimer = setTimeout(() => {
         const isMobile = window.innerWidth < 1024;
 
         // Curtain is about to open — release the page entrance animations
@@ -102,6 +104,7 @@ export function PageLoader() {
     }
 
     return () => {
+      clearTimeout(dismissTimer);
       ctx.revert();
       window.removeEventListener("load", dismiss);
       document.body.style.overflow = "";
