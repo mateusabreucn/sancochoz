@@ -28,7 +28,10 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
     setDisplayCategory(state.category);
   }, [state.category]);
 
-  const videos = videosByCategory[displayCategory] ?? [];
+  const videos = useMemo(
+    () => videosByCategory[displayCategory] ?? [],
+    [videosByCategory, displayCategory]
+  );
 
   const copies = useMemo(() => {
     if (videos.length === 0) return 0;
@@ -66,6 +69,16 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
     readyTimedOut ||
     videos.slice(0, eagerCount).every((v) => loadedIds.has(v.id));
 
+  // Sequential queue: after the eager set, mount one new video at a time so
+  // downloads never compete for bandwidth or browser connection slots
+  const mountCount = useMemo(() => {
+    let n = eagerCount;
+    while (n < videos.length && videos.slice(0, n).every((v) => loadedIds.has(v.id))) {
+      n++;
+    }
+    return n;
+  }, [videos, eagerCount, loadedIds]);
+
   const { scrollBy } = useMarquee({
     trackRef,
     paused: state.activeVideoId !== null,
@@ -101,7 +114,7 @@ export default function ShowcaseDesktop({ videosByCategory }: Props) {
                 entry={video}
                 cardId={`${video.id}-${i}`}
                 stackIndex={i}
-                eagerMount={i < eagerCount}
+                eagerMount={i < videos.length ? i < mountCount : loadedIds.has(video.id)}
                 onLoaded={handleVideoLoaded}
               />
             ))}

@@ -19,7 +19,13 @@ export function VideoCardMobile({ entry, isActive, muted, eagerMount, onToggleMu
   const [hasBeenInView, setHasBeenInView] = useState(eagerMount ?? false);
   const [videoReady, setVideoReady] = useState(false);
 
-  // Lazy-mount: load the video one full screen before it becomes visible
+  // The loading queue flips eagerMount to true when it's this card's turn
+  useEffect(() => {
+    if (eagerMount) setHasBeenInView(true);
+  }, [eagerMount]);
+
+  // Lazy-mount fallback: load the video one full screen before it becomes
+  // visible (covers cards the queue hasn't reached when the user swipes fast)
   useEffect(() => {
     if (eagerMount) return;
     const el = containerRef.current;

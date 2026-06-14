@@ -32,7 +32,10 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
     setDisplayCategory(state.category);
   }, [state.category]);
 
-  const videos = videosByCategory[displayCategory] ?? [];
+  const videos = useMemo(
+    () => videosByCategory[displayCategory] ?? [],
+    [videosByCategory, displayCategory]
+  );
 
   const copies = videos.length === 0 ? 0 : Math.max(2, videos.length < 3 ? 4 : 2);
   const displayVideos = useMemo(
@@ -61,6 +64,16 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
     videos.length === 0 ||
     readyTimedOut ||
     videos.slice(0, eagerCount).every((v) => loadedIds.has(v.id));
+
+  // Sequential queue: after the eager set, mount one new video at a time so
+  // downloads never compete for bandwidth or browser connection slots
+  const mountCount = useMemo(() => {
+    let n = eagerCount;
+    while (n < videos.length && videos.slice(0, n).every((v) => loadedIds.has(v.id))) {
+      n++;
+    }
+    return n;
+  }, [videos, eagerCount, loadedIds]);
 
   const { scrollBy, snapToNearest } = useMarquee({
     trackRef,
@@ -112,7 +125,7 @@ export default function ShowcaseMobile({ videosByCategory }: Props) {
                 entry={video}
                 isActive={activeVideoId === video.id}
                 muted={muted}
-                eagerMount={i < eagerCount}
+                eagerMount={i < videos.length ? i < mountCount : loadedIds.has(video.id)}
                 onToggleMute={toggleMute}
                 onLoaded={handleVideoLoaded}
               />

@@ -29,8 +29,13 @@ export function VideoCardDesktop({ entry, cardId, stackIndex, eagerMount, onLoad
   const isActive = state.activeVideoId === cardId;
   const isDimmed = state.activeVideoId !== null && !isActive;
 
-  // Lazy-mount: load the video element before the card scrolls into view
-  // (rootMargin pre-mounts it ~2 cards ahead so it never appears blank)
+  // The loading queue flips eagerMount to true when it's this card's turn
+  useEffect(() => {
+    if (eagerMount) setHasBeenInView(true);
+  }, [eagerMount]);
+
+  // Lazy-mount fallback: load the video element before the card scrolls into
+  // view (covers cards the queue hasn't reached when the user scrolls fast)
   useEffect(() => {
     if (eagerMount) return;
     const el = containerRef.current;
