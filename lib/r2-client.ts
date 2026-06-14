@@ -80,40 +80,31 @@ async function listVideosByCategory(category: Category): Promise<VideoEntry[]> {
   const videos: VideoEntry[] = [];
   let continuationToken: string | undefined;
 
-  try {
-    do {
-      const response = await client.send(
-        new ListObjectsV2Command({
-          Bucket: bucket,
-          Prefix: prefix,
-          ContinuationToken: continuationToken,
-        }),
-      );
+  do {
+    const response = await client.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+      }),
+    );
 
-      for (const object of response.Contents ?? []) {
-        const key = object.Key;
-        if (!key || key === prefix || !key.toLowerCase().endsWith(".mp4")) {
-          continue;
-        }
-
-        videos.push({
-          id: keyToId(category, key),
-          category,
-          src: keyToPublicUrl(key),
-          title: keyToTitle(category, key),
-        });
+    for (const object of response.Contents ?? []) {
+      const key = object.Key;
+      if (!key || key === prefix || !key.toLowerCase().endsWith(".mp4")) {
+        continue;
       }
 
-      continuationToken = response.NextContinuationToken;
-    } while (continuationToken);
-  } catch (error) {
-    // An empty folder makes R2 answer ListObjectsV2 with NoSuchKey on this SDK
-    // version; treat any listing failure as an empty category so an empty (or
-    // not-yet-populated) folder degrades to "em breve" instead of breaking the
-    // static build.
-    console.error(`R2 listing failed for category "${category}":`, error);
-    return [];
-  }
+      videos.push({
+        id: keyToId(category, key),
+        category,
+        src: keyToPublicUrl(key),
+        title: keyToTitle(category, key),
+      });
+    }
+
+    continuationToken = response.NextContinuationToken;
+  } while (continuationToken);
 
   return videos.sort((a, b) =>
     a.id.localeCompare(b.id, undefined, { numeric: true, sensitivity: "base" }),
