@@ -98,7 +98,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-[200] h-14 lg:h-20 bg-white shadow-lg">
+      <header className="sticky top-0 z-[200] h-14 lg:h-20 bg-white shadow-lg 3xl:w-screen 3xl:ml-[calc(50%-50vw)]">
         {/* ── Mobile layout ── */}
         <div className="lg:hidden h-full flex items-center px-4 relative">
           <motion.div {...fade(0, loaderDone)}>

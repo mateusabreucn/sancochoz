@@ -21,6 +21,10 @@ html {
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* The Header and Showcase break out of the 1920px content cap to full-bleed
+     on >=1920px screens via 100vw; clip (not hidden) keeps position:sticky
+     working while preventing a scrollbar-width horizontal overflow. */
+  overflow-x: clip;
 }
 
 /* Page loader */
