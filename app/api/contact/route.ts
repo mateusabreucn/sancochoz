@@ -56,8 +56,12 @@ export async function POST(request: Request) {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
-      from: "Sancochoz Site <onboarding@resend.dev>",
-      to: process.env.CONTACT_EMAIL || "gustavo@sancochoz.com",
+      // Until sancochoz.com is verified in Resend, the shared onboarding sender
+      // only delivers to the Resend account's own address (contact@sancochoz.com).
+      // After verifying the domain, set RESEND_FROM in the host env to e.g.
+      // "Sancochoz Site <noreply@sancochoz.com>" — no code change needed.
+      from: process.env.RESEND_FROM || "Sancochoz Site <onboarding@resend.dev>",
+      to: process.env.CONTACT_EMAIL || "contact@sancochoz.com",
       reply_to: data.email,
       subject: `New contact from ${data.name}`,
       html: `
