@@ -50,8 +50,7 @@ export default function ContactForm() {
           .email(e.emailInvalid),
         message: z.string().min(1, e.messageRequired).max(2000),
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [t],
+    [e],
   );
 
   type ContactData = z.infer<typeof contactSchema>;
